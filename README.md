@@ -150,4 +150,4 @@ MIT (or your preferred license)
 ---
 Built with Expo. See:
 - https://docs.expo.dev/
-- https://docs.expo.dev/workflow/prebuild/
+- https://docs.expo.dev/workflow/prebuild/# ble-core
