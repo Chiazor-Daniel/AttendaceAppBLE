@@ -12,15 +12,38 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "This app uses location to enable Bluetooth-based attendance (required on Android)."
+        }
+      ]
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.chiazordaniel.blecch",
+      "infoPlist": {
+        "NSBluetoothAlwaysUsageDescription": "Used for offline peer-to-peer attendance via Bluetooth mesh.",
+        "NSBluetoothPeripheralUsageDescription": "Needed to connect to nearby devices for class attendance.",
+        "NSLocationWhenInUseUsageDescription": "Required for Bluetooth scanning on iOS."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.chiazordaniel.blecch",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "BLUETOOTH",
+        "BLUETOOTH_ADMIN",
+        "BLUETOOTH_ADVERTISE",
+        "BLUETOOTH_CONNECT",
+        "BLUETOOTH_SCAN"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
