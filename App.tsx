@@ -54,6 +54,7 @@ import CalendarScreen from "./screens/CalendarScreen";
 import CalendarUpcomingScreen from "./screens/CalendarUpcomingScreen";
 import { CardStyleInterpolators } from "@react-navigation/stack";
 import Header from "./components/header";
+import { StatusBar } from "expo-status-bar";
 
 const Stack = createStackNavigator();
 
@@ -102,10 +103,10 @@ const hiddenHeaderScreens = [
 ];
 
 export default function App() {
-  // Bootstrap Transport on app start
   useEffect(() => {
     const initTransport = async () => {
       try {
+        await new Promise(r => setTimeout(r, 1000)); // 👈 wait for activity
         const uniqueId = await DeviceInfo.getUniqueId();
         const nickname = `S-${uniqueId}`;
         await Transport.start(nickname);
@@ -116,15 +117,12 @@ export default function App() {
     };
 
     initTransport();
-
-    // Cleanup on unmount
-    return () => {
-      Transport.stop();
-    };
+    return () => Transport.stop();
   }, []);
 
   return (
     <NavigationContainer>
+      <StatusBar style="auto" />
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
@@ -132,13 +130,12 @@ export default function App() {
         }}
         initialRouteName="Splash"
       >
-        {screens.map(({ name, component, auth }) => (
+        {screens.map(({ name, component }) => (
           <Stack.Screen
             key={name}
             name={name}
             children={(props) => (
               <>
-                {/* Only show Header if screen is NOT in hidden list */}
                 {!hiddenHeaderScreens.includes(name) && <Header />}
                 {React.createElement(component, props)}
               </>
@@ -149,6 +146,7 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
 
 // 👇 Your screens array — unchanged, just moved outside for clarity
 const screens = [
