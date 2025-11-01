@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import Transport from '../src/services/BleTransport';
 import DeviceInfo from 'react-native-device-info';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 
 type AttendanceStatus = 'waiting' | 'present' | 'late';
 

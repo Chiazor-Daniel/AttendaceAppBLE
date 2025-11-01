@@ -10,7 +10,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import Transport from '../src/services/BleTransport';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 
 interface SessionAd {
   meetingId: string;

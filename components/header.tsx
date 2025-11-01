@@ -1,8 +1,7 @@
 import React, { use } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 
 const Header = ({ name}: any) => {
   const navigation = useNavigation();
@@ -34,7 +33,7 @@ const Header = ({ name}: any) => {
         </View>
     </View> :   <View style={styles.header2}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back" size={24} color="white" />
+              <Ionicons name="arrow-back" size={24} color="white" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>{name}</Text>
             <View style={{ width: 24 }} />

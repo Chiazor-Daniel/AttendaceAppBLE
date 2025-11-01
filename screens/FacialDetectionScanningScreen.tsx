@@ -11,7 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import { Camera, useCameraDevice } from 'react-native-vision-camera';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { Ionicons as Icon } from '@expo/vector-icons';
 
 const FacialDetectionScanningScreen = ({ navigation, route }: any) => {
   const { meetingId, courseCode } = route.params || {};

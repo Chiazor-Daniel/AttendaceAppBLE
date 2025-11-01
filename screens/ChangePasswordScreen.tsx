@@ -1,7 +1,7 @@
 "use client"
 
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, TextInput } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import { Ionicons as Icon } from '@expo/vector-icons'
 import { useState } from "react"
 
 const ChangePasswordScreen = ({ navigation }) => {

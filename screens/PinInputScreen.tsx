@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ActivityIndicator } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import { Ionicons as Icon } from '@expo/vector-icons'
 import Transport from "../src/services/BleTransport"
 import DeviceInfo from "react-native-device-info"
 

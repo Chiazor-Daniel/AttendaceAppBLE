@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import { Ionicons as Icon } from '@expo/vector-icons'
 import { useState } from "react"
 
 const CalendarScreen = ({ navigation }: any) => {
