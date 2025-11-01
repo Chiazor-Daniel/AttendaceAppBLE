@@ -18,6 +18,12 @@
         {
           "locationWhenInUsePermission": "This app uses location to enable Bluetooth-based attendance (required on Android)."
         }
+      ],
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "Camera access is required for facial recognition to verify your identity for class attendance."
+        }
       ]
     ],
     "ios": {
@@ -26,7 +32,9 @@
       "infoPlist": {
         "NSBluetoothAlwaysUsageDescription": "Used for offline peer-to-peer attendance via Bluetooth mesh.",
         "NSBluetoothPeripheralUsageDescription": "Needed to connect to nearby devices for class attendance.",
-        "NSLocationWhenInUseUsageDescription": "Required for Bluetooth scanning on iOS."
+        "NSLocationWhenInUseUsageDescription": "Required for Bluetooth scanning on iOS.",
+        "NSCameraUsageDescription": "Camera access is required for facial recognition to verify your identity for class attendance.",
+        "NSFaceIDUsageDescription": "Face ID is used to verify your identity when joining class sessions."
       }
     },
     "android": {
@@ -42,7 +50,10 @@
         "BLUETOOTH_ADMIN",
         "BLUETOOTH_ADVERTISE",
         "BLUETOOTH_CONNECT",
-        "BLUETOOTH_SCAN"
+        "BLUETOOTH_SCAN",
+        "CAMERA",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT"
       ]
     },
     "web": {
