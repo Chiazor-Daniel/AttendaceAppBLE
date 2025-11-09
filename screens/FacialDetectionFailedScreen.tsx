@@ -1,5 +1,11 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
 const FacialDetectionFailedScreen = ({ navigation }) => {
   return (
@@ -30,15 +36,20 @@ const FacialDetectionFailedScreen = ({ navigation }) => {
 
         <Text style={styles.failureTitle}>Facial Recognition Failed</Text>
 
-        <Text style={styles.failureDescription}>We were unable to capture your face properly. Please try again.</Text>
+        <Text style={styles.failureDescription}>
+          We were unable to capture your face properly. Please try again.
+        </Text>
 
-        <TouchableOpacity style={styles.tryAgainButton} onPress={() => navigation.navigate("FacialDetectionScanning")}>
+        <TouchableOpacity
+          style={styles.tryAgainButton}
+          onPress={() => navigation.navigate("FacialDetectionScanning")}
+        >
           <Text style={styles.tryAgainButtonText}>Try Again</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -130,6 +141,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-})
+});
 
-export default FacialDetectionFailedScreen
+export default FacialDetectionFailedScreen;

@@ -1,53 +1,13 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ActivityIndicator } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
-import Transport from "../src/services/BleTransport"
-import DeviceInfo from "react-native-device-info"
-import { useState } from "react"
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
-const FacialDetectionSuccessScreen = ({ navigation, route }: any) => {
-  const [isJoining, setIsJoining] = useState(false);
-  const { meetingId, courseCode } = route.params || {};
-
-  const handleContinue = async () => {
-    if (!meetingId || !courseCode) {
-      // If no meetingId/courseCode, navigate to SessionConnected (fallback)
-      navigation.navigate("SessionConnected");
-      return;
-    }
-
-    setIsJoining(true);
-    
-    try {
-      const uniqueId = await DeviceInfo.getUniqueId();
-      const joinMessage = {
-        type: 'att:join',
-        meetingId: meetingId,
-        senderId: uniqueId,
-        courseCode: courseCode,
-      };
-
-      Transport.send(joinMessage);
-      console.log('✅ Sent att:join:', joinMessage);
-
-      // Navigate to AttendanceInProgress with session info
-      navigation.replace('AttendanceInProgress', {
-        meetingId,
-        courseCode,
-        timeJoined: new Date().toLocaleTimeString(),
-      });
-    } catch (error) {
-      console.error('Failed to send join message:', error);
-      // Still navigate even if send fails
-      navigation.replace('AttendanceInProgress', {
-        meetingId,
-        courseCode,
-        timeJoined: new Date().toLocaleTimeString(),
-      });
-    } finally {
-      setIsJoining(false);
-    }
-  };
-
+const FacialDetectionSuccessScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -79,24 +39,20 @@ const FacialDetectionSuccessScreen = ({ navigation, route }: any) => {
         <Text style={styles.successTitle}>Identity Successfully Verified</Text>
 
         <Text style={styles.successDescription}>
-          Your face has been successfully verified and recorded for this class session. Enjoy the lecture!
+          Your face has been successfully verified and recorded for this class
+          session. Enjoy the lecture!
         </Text>
 
-        <TouchableOpacity 
-          style={[styles.continueButton, isJoining && styles.continueButtonDisabled]} 
-          onPress={handleContinue}
-          disabled={isJoining}
+        <TouchableOpacity
+          style={styles.continueButton}
+          onPress={() => navigation.navigate("SessionConnected")}
         >
-          {isJoining ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text style={styles.continueButtonText}>Continue</Text>
-          )}
+          <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -174,14 +130,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
   },
-  continueButtonDisabled: {
-    opacity: 0.6,
-  },
   continueButtonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",
   },
-})
+});
 
-export default FacialDetectionSuccessScreen
+export default FacialDetectionSuccessScreen;

@@ -1,9 +1,28 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
-const FacialRecognitionSetupScreen = ({ navigation, route }: any) => {
-  const { meetingId, courseCode } = route.params || {};
+const FacialRecognitionSetupScreen = ({ navigation, route }) => {
+  // Pass mesh params if available
+  const { meshMode, session, verificationType } = route.params || {};
   
+  const handleStartDetection = () => {
+    const params: any = {};
+    
+    if (meshMode && session) {
+      params.meshMode = meshMode;
+      params.session = session;
+      params.verificationType = verificationType || "facial";
+    }
+    
+    navigation.navigate("FacialDetectionScanning", params);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -15,7 +34,18 @@ const FacialRecognitionSetupScreen = ({ navigation, route }: any) => {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.subtitle}>Align your face to verify your identity and join the class.</Text>
+        <Text style={styles.subtitle}>
+          Align your face to verify your identity and join the class.
+        </Text>
+
+        {/* Mesh Status */}
+        {meshMode && session && (
+          <View style={styles.meshInfoContainer}>
+            <Text style={styles.meshInfoText}>
+              📡 Joining: {session.course} by {session.lecturer}
+            </Text>
+          </View>
+        )}
 
         {/* Face Detection Frame */}
         <View style={styles.detectionContainer}>
@@ -28,16 +58,16 @@ const FacialRecognitionSetupScreen = ({ navigation, route }: any) => {
           </View>
         </View>
 
-        <TouchableOpacity 
-          style={styles.startButton} 
-          onPress={() => navigation.navigate("FacialDetectionScanning", { meetingId, courseCode })}
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={handleStartDetection}
         >
           <Text style={styles.startButtonText}>Start Facial detection</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -115,6 +145,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-})
+  meshInfoContainer: {
+    backgroundColor: "#e0e7ff",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 24,
+    alignItems: "center",
+  },
+  meshInfoText: {
+    fontSize: 12,
+    color: "#8B5CF6",
+    fontWeight: "500",
+    textAlign: "center",
+  },
+});
 
-export default FacialRecognitionSetupScreen
+export default FacialRecognitionSetupScreen;

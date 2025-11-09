@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,15 +6,11 @@ import {
   StyleSheet,
   SafeAreaView,
   Animated,
-  ActivityIndicator,
 } from 'react-native';
-import Transport from '../src/services/BleTransport';
-import DeviceInfo from 'react-native-device-info';
 
 const FingerprintSuccessScreen = ({ navigation, route }: any) => {
   const scaleValue = new Animated.Value(0);
-  const { isClass, meetingId, courseCode } = route.params || {};
-  const [isJoining, setIsJoining] = useState(false);
+  const { isClass } = route.params || {};
 
   useEffect(() => {
     Animated.spring(scaleValue, {
@@ -24,54 +20,22 @@ const FingerprintSuccessScreen = ({ navigation, route }: any) => {
       useNativeDriver: true,
     }).start();
 
-    // Auto-navigate after 2 seconds only if not joining class
-    if (!isClass) {
-      const timer = setTimeout(() => {
+    const timer = setTimeout(() => {
+      if (isClass) {
+        navigation.navigate('SessionConnected');
+      } else {
         navigation.navigate('SetPin');
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [isClass, navigation]);
+      }
+    }, 2000);
 
-  const handleContinue = async () => {
-    if (!isClass) {
-      navigation.navigate('SetPin');
-      return;
-    }
+    return () => clearTimeout(timer);
+  }, [isClass]);
 
-    // For class attendance, send join message
-    if (!meetingId || !courseCode) {
+  const handleContinue = () => {
+    if (isClass) {
       navigation.navigate('SessionConnected');
-      return;
-    }
-
-    setIsJoining(true);
-    try {
-      const uniqueId = await DeviceInfo.getUniqueId();
-      const joinMessage = {
-        type: 'att:join',
-        meetingId: meetingId,
-        senderId: uniqueId,
-        courseCode: courseCode,
-      };
-
-      Transport.send(joinMessage);
-      console.log('✅ Sent att:join via FingerprintSuccess:', joinMessage);
-
-      navigation.replace('AttendanceInProgress', {
-        meetingId,
-        courseCode,
-        timeJoined: new Date().toLocaleTimeString(),
-      });
-    } catch (error) {
-      console.error('Failed to send join message:', error);
-      navigation.replace('AttendanceInProgress', {
-        meetingId,
-        courseCode,
-        timeJoined: new Date().toLocaleTimeString(),
-      });
-    } finally {
-      setIsJoining(false);
+    } else {
+      navigation.navigate('SetPin');
     }
   };
 
@@ -109,17 +73,12 @@ const FingerprintSuccessScreen = ({ navigation, route }: any) => {
         )}
 
         <TouchableOpacity
-          style={[styles.continueButton, isJoining && styles.continueButtonDisabled]}
+          style={styles.continueButton}
           onPress={handleContinue}
-          disabled={isJoining}
         >
-          {isJoining ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text style={styles.continueButtonText}>
-              {isClass ? 'Go to Session' : 'Continue'}
-            </Text>
-          )}
+          <Text style={styles.continueButtonText}>
+            {isClass ? 'Go to Session' : 'Continue'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -205,9 +164,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
-  },
-  continueButtonDisabled: {
-    opacity: 0.6,
   },
   continueButtonText: {
     color: 'white',

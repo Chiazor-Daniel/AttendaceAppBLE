@@ -1,85 +1,55 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ActivityIndicator } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
-import Transport from "../src/services/BleTransport"
-import DeviceInfo from "react-native-device-info"
+import { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
-const PinInputScreen = ({ navigation, route }: any) => {
-  const { meetingId, courseCode, isClass } = route.params || {};
-  const [pin, setPin] = useState("")
-  const [isVerifying, setIsVerifying] = useState(false)
-  const maxPinLength = 6
+const PinInputScreen = ({ navigation }) => {
+  const [pin, setPin] = useState("");
+  const maxPinLength = 6;
 
   const handleNumberPress = (number) => {
     if (pin.length < maxPinLength) {
-      setPin(pin + number)
+      setPin(pin + number);
     }
-  }
+  };
 
   const handleBackspace = () => {
-    setPin(pin.slice(0, -1))
-  }
+    setPin(pin.slice(0, -1));
+  };
 
-  const handleVerify = async () => {
-    if (pin.length !== maxPinLength) return;
-
-    // For class attendance, verify PIN and send join message
-    if (isClass && meetingId && courseCode) {
-      setIsVerifying(true);
-      try {
-        // Simple PIN check (you can enhance this later)
-        if (pin === "123456" || pin.length === 6) {
-          const uniqueId = await DeviceInfo.getUniqueId();
-          const joinMessage = {
-            type: 'att:join',
-            meetingId: meetingId,
-            senderId: uniqueId,
-            courseCode: courseCode,
-          };
-
-          Transport.send(joinMessage);
-          console.log('✅ Sent att:join via PIN:', joinMessage);
-
-          navigation.replace('AttendanceInProgress', {
-            meetingId,
-            courseCode,
-            timeJoined: new Date().toLocaleTimeString(),
-          });
-        } else {
-          navigation.navigate("PinInputError");
-        }
-      } catch (error) {
-        console.error('Failed to send join message:', error);
-        // Still navigate even if send fails
-        navigation.replace('AttendanceInProgress', {
-          meetingId,
-          courseCode,
-          timeJoined: new Date().toLocaleTimeString(),
-        });
-      } finally {
-        setIsVerifying(false);
-      }
-    } else {
-      // Non-class PIN verification (fallback)
+  const handleVerify = () => {
+    if (pin.length === maxPinLength) {
+      // Simulate PIN verification
       if (pin === "123456") {
         navigation.navigate("SessionConnected");
       } else {
         navigation.navigate("PinInputError");
       }
     }
-  }
+  };
 
   const renderPinDots = () => {
     return (
       <View style={styles.pinContainer}>
         {Array.from({ length: maxPinLength }).map((_, index) => (
-          <View key={index} style={[styles.pinDot, index < pin.length ? styles.pinDotFilled : styles.pinDotEmpty]} />
+          <View
+            key={index}
+            style={[
+              styles.pinDot,
+              index < pin.length ? styles.pinDotFilled : styles.pinDotEmpty,
+            ]}
+          />
         ))}
       </View>
-    )
-  }
+    );
+  };
 
   const renderKeypad = () => {
     const numbers = [
@@ -87,7 +57,7 @@ const PinInputScreen = ({ navigation, route }: any) => {
       ["4", "5", "6"],
       ["7", "8", "9"],
       ["X", "0", "⌫"],
-    ]
+    ];
 
     return (
       <View style={styles.keypad}>
@@ -101,9 +71,9 @@ const PinInputScreen = ({ navigation, route }: any) => {
                   if (key === "X") {
                     // Handle X button (could be used for cancel)
                   } else if (key === "⌫") {
-                    handleBackspace()
+                    handleBackspace();
                   } else {
-                    handleNumberPress(key)
+                    handleNumberPress(key);
                   }
                 }}
               >
@@ -113,8 +83,8 @@ const PinInputScreen = ({ navigation, route }: any) => {
           </View>
         ))}
       </View>
-    )
-  }
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -127,7 +97,9 @@ const PinInputScreen = ({ navigation, route }: any) => {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.subtitle}>Input your 6-digit PIN to join this class session.</Text>
+        <Text style={styles.subtitle}>
+          Input your 6-digit PIN to join this class session.
+        </Text>
 
         {renderPinDots()}
         {renderKeypad()}
@@ -135,21 +107,19 @@ const PinInputScreen = ({ navigation, route }: any) => {
         <TouchableOpacity
           style={[
             styles.verifyButton,
-            pin.length === maxPinLength ? styles.verifyButtonActive : styles.verifyButtonInactive,
+            pin.length === maxPinLength
+              ? styles.verifyButtonActive
+              : styles.verifyButtonInactive,
           ]}
           onPress={handleVerify}
-          disabled={pin.length !== maxPinLength || isVerifying}
+          disabled={pin.length !== maxPinLength}
         >
-          {isVerifying ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text style={styles.verifyButtonText}>Verify</Text>
-          )}
+          <Text style={styles.verifyButtonText}>Verify</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -240,6 +210,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-})
+});
 
-export default PinInputScreen
+export default PinInputScreen;

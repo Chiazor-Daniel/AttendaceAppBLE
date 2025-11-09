@@ -1,20 +1,25 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
 const AssignmentDetailScreen = ({ navigation, route }) => {
-  const { assignment } = route.params || {}
+  const { assignment } = route.params || {};
 
   const questions = [
     "What is the relationship between Communication and speaking when it comes to public speaking?",
     "What is the relationship between Communication and speaking when it comes to public speaking?",
     "What is the relationship between Communication and speaking when it comes to public speaking?",
     "What is the relationship between Communication and speaking when it comes to public speaking?",
-  ]
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
-     
-
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.assignmentTitle}>COM 201 Assignment</Text>
 
@@ -45,8 +50,8 @@ const AssignmentDetailScreen = ({ navigation, route }) => {
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -121,6 +126,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#1f2937",
   },
-})
+});
 
-export default AssignmentDetailScreen
+export default AssignmentDetailScreen;

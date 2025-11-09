@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,129 +6,66 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
-  ActivityIndicator,
+  Switch,
 } from 'react-native';
-import Transport from '../src/services/BleTransport';
-import DeviceInfo from 'react-native-device-info';
-import { Ionicons } from '@expo/vector-icons';
 
-type AttendanceStatus = 'waiting' | 'present' | 'late';
-
-const AttendanceInProgressScreen = ({ navigation, route }: any) => {
-  const { meetingId, courseCode, timeJoined } = route.params || {
-    meetingId: 'N/A',
-    courseCode: 'N/A',
-    timeJoined: new Date().toLocaleTimeString(),
-  };
-
-  const [status, setStatus] = useState<AttendanceStatus>('waiting');
-  const [deviceId, setDeviceId] = useState<string>('');
-
-  // Get device ID on mount
-  useEffect(() => {
-    DeviceInfo.getUniqueId().then(setDeviceId);
-  }, []);
-
-  // Listen for att:ack and att:end messages
-  useEffect(() => {
-    if (!Transport.isActive()) {
-      console.warn('⚠️ Transport not active');
-      return;
-    }
-
-    const handleMessage = (m: any) => {
-      if (m.type === 'att:ack' && m.senderId === deviceId && m.meetingId === meetingId) {
-        console.log('✅ Received attendance acknowledgment:', m);
-        setStatus(m.status === 'late' ? 'late' : 'present');
-      }
-
-      if (m.type === 'att:end' && m.meetingId === meetingId) {
-        console.log('📢 Session ended by lecturer');
-        navigation.replace('SessionOver', {
-          meetingId,
-          courseCode,
-          status,
-        });
-      }
-    };
-
-    Transport.on('m', handleMessage);
-    console.log('👂 Listening for attendance updates...');
-
-    return () => {
-      Transport.off('m', handleMessage);
-    };
-  }, [meetingId, deviceId, status, navigation, courseCode]);
-
-  const getStatusDisplay = () => {
-    switch (status) {
-      case 'waiting':
-        return { text: 'Waiting for confirmation...', color: '#f59e0b', icon: 'time-outline' };
-      case 'present':
-        return { text: 'Present ✓', color: '#10b981', icon: 'checkmark-circle' };
-      case 'late':
-        return { text: 'Late ⚠', color: '#f59e0b', icon: 'time-outline' };
-      default:
-        return { text: 'Unknown', color: '#6b7280', icon: 'help-circle-outline' };
-    }
-  };
-
-  const statusDisplay = getStatusDisplay();
-  const currentDate = new Date().toLocaleDateString();
+const AttendanceInProgressScreen = ({ navigation }) => {
+  const [isOnlineMode, setIsOnlineMode] = useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+
+        {/* Progress Details */}
         <View style={styles.progressSection}>
           <Text style={styles.progressTitle}>Attendance in Progress</Text>
-
+          
           <Text style={styles.progressDescription}>
-            Your attendance request has been sent. Waiting for lecturer confirmation.
+            Meeting ID expires after every session. Your attendance is being saved in the background and will be synced once internet connection is back.
           </Text>
 
           <View style={styles.detailsContainer}>
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Meeting ID</Text>
-              <Text style={styles.detailValue}>{meetingId}</Text>
+              <Text style={styles.detailValue}>123456789FR</Text>
             </View>
 
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Course</Text>
-              <Text style={styles.detailValue}>{courseCode}</Text>
+              <Text style={styles.detailValue}>BIO 101</Text>
             </View>
 
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Time Joined</Text>
-              <Text style={styles.detailValue}>{timeJoined}</Text>
+              <Text style={styles.detailValue}>08:10 am</Text>
             </View>
 
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Date</Text>
-              <Text style={styles.detailValue}>{currentDate}</Text>
+              <Text style={styles.detailValue}>12-02-2025</Text>
             </View>
 
             <View style={styles.statusRow}>
               <Text style={styles.statusLabel}>Attendance Status</Text>
-              <View style={[styles.statusBadge, { backgroundColor: `${statusDisplay.color}15` }]}>
-                <Ionicons name={statusDisplay.icon} size={20} color={statusDisplay.color} />
-                <Text style={[styles.statusText, { color: statusDisplay.color }]}>
-                  {statusDisplay.text}
-                </Text>
-              </View>
-              {status === 'waiting' && (
-                <View style={styles.waitingIndicator}>
-                  <ActivityIndicator size="small" color="#8B5CF6" />
-                  <Text style={styles.waitingText}>
-                    Waiting for lecturer to confirm your attendance...
-                  </Text>
-                </View>
-              )}
+              <Text style={styles.statusNote}>
+                Attendance Status will be recorded when back online
+              </Text>
+            </View>
+
+            <View style={styles.switchRow}>
+              <Text style={styles.switchLabel}>Switch to online mode</Text>
+              <Switch
+                value={isOnlineMode}
+                onValueChange={setIsOnlineMode}
+                trackColor={{ false: '#d1d5db', true: '#8B5CF6' }}
+                thumbColor={isOnlineMode ? '#ffffff' : '#ffffff'}
+              />
             </View>
           </View>
 
-          <TouchableOpacity
+          <TouchableOpacity 
             style={styles.leaveButton}
-            onPress={() => navigation.navigate('Dashboard')}
+            onPress={() => navigation.goBack()}
           >
             <Text style={styles.leaveButtonText}>Leave Session</Text>
           </TouchableOpacity>
@@ -264,29 +201,15 @@ const styles = StyleSheet.create({
     color: '#8B5CF6',
     fontStyle: 'italic',
   },
-  statusBadge: {
+  switchRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginTop: 8,
-    gap: 8,
   },
-  statusText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  waitingIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
-    gap: 8,
-  },
-  waitingText: {
-    fontSize: 12,
-    color: '#6b7280',
-    fontStyle: 'italic',
+  switchLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#1f2937',
   },
   leaveButton: {
     backgroundColor: '#8B5CF6',

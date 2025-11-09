@@ -1,44 +1,56 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
+import { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
 const PinInputErrorScreen = ({ navigation }) => {
-  const [pin, setPin] = useState("")
-  const maxPinLength = 6
+  const [pin, setPin] = useState("");
+  const maxPinLength = 6;
 
   const handleNumberPress = (number) => {
     if (pin.length < maxPinLength) {
-      setPin(pin + number)
+      setPin(pin + number);
     }
-  }
+  };
 
   const handleBackspace = () => {
-    setPin(pin.slice(0, -1))
-  }
+    setPin(pin.slice(0, -1));
+  };
 
   const handleVerify = () => {
     if (pin.length === maxPinLength) {
       // Simulate PIN verification
       if (pin === "123456") {
-        navigation.navigate("SessionConnected")
+        navigation.navigate("SessionConnected");
       } else {
         // Show error again or handle multiple attempts
-        setPin("")
+        setPin("");
       }
     }
-  }
+  };
 
   const renderPinDots = () => {
     return (
       <View style={styles.pinContainer}>
         {Array.from({ length: maxPinLength }).map((_, index) => (
-          <View key={index} style={[styles.pinDot, index < pin.length ? styles.pinDotFilled : styles.pinDotEmpty]} />
+          <View
+            key={index}
+            style={[
+              styles.pinDot,
+              index < pin.length ? styles.pinDotFilled : styles.pinDotEmpty,
+            ]}
+          />
         ))}
       </View>
-    )
-  }
+    );
+  };
 
   const renderKeypad = () => {
     const numbers = [
@@ -46,7 +58,7 @@ const PinInputErrorScreen = ({ navigation }) => {
       ["4", "5", "6"],
       ["7", "8", "9"],
       ["X", "0", "⌫"],
-    ]
+    ];
 
     return (
       <View style={styles.keypad}>
@@ -60,9 +72,9 @@ const PinInputErrorScreen = ({ navigation }) => {
                   if (key === "X") {
                     // Handle X button (could be used for cancel)
                   } else if (key === "⌫") {
-                    handleBackspace()
+                    handleBackspace();
                   } else {
-                    handleNumberPress(key)
+                    handleNumberPress(key);
                   }
                 }}
               >
@@ -72,8 +84,8 @@ const PinInputErrorScreen = ({ navigation }) => {
           </View>
         ))}
       </View>
-    )
-  }
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -86,7 +98,9 @@ const PinInputErrorScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.subtitle}>Input your 6-digit PIN to join this class session.</Text>
+        <Text style={styles.subtitle}>
+          Input your 6-digit PIN to join this class session.
+        </Text>
 
         {renderPinDots()}
 
@@ -97,7 +111,9 @@ const PinInputErrorScreen = ({ navigation }) => {
         <TouchableOpacity
           style={[
             styles.verifyButton,
-            pin.length === maxPinLength ? styles.verifyButtonActive : styles.verifyButtonInactive,
+            pin.length === maxPinLength
+              ? styles.verifyButtonActive
+              : styles.verifyButtonInactive,
           ]}
           onPress={handleVerify}
           disabled={pin.length !== maxPinLength}
@@ -106,8 +122,8 @@ const PinInputErrorScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -204,6 +220,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-})
+});
 
-export default PinInputErrorScreen
+export default PinInputErrorScreen;

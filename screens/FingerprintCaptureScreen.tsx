@@ -15,8 +15,8 @@ const FingerprintCaptureScreen = ({ navigation, route }: any) => {
   const [progress] = useState(new Animated.Value(0));
   const pulseValue = new Animated.Value(1);
 
-  // Get isClass, meetingId, courseCode from route params
-  const { isClass, meetingId, courseCode } = route.params || {};
+  // Get isClass from route params
+  const { isClass } = route.params || {};
 
   // 🔥 Skip immediately on iOS
   useEffect(() => {
@@ -66,8 +66,8 @@ const FingerprintCaptureScreen = ({ navigation, route }: any) => {
           duration: 800,
           useNativeDriver: false,
         }).start(() => {
-          // Pass isClass, meetingId, courseCode to success screen
-          navigation.navigate('FingerprintSuccess', { isClass, meetingId, courseCode });
+          // Pass isClass to success screen
+          navigation.navigate('FingerprintSuccess', { isClass });
         });
       } else {
         navigation.replace('SetPin');

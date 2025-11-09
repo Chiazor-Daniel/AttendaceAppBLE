@@ -1,5 +1,12 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
 const AssignmentListScreen = ({ navigation }) => {
   const assignments = [
@@ -52,26 +59,30 @@ const AssignmentListScreen = ({ navigation }) => {
       deadline: "Deadline 2nd June 2025",
       status: "View",
     },
-  ]
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
-      
-
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {assignments.map((assignment, index) => (
           <TouchableOpacity
             key={assignment.id}
             style={styles.assignmentItem}
-            onPress={() => navigation.navigate("AssignmentDetail", { assignment })}
+            onPress={() =>
+              navigation.navigate("AssignmentDetail", { assignment })
+            }
           >
             <View style={styles.assignmentIcon}>
               <Icon name="document-text" size={20} color="#8B5CF6" />
             </View>
             <View style={styles.assignmentContent}>
               <Text style={styles.assignmentTitle}>{assignment.title}</Text>
-              <Text style={styles.assignmentInstructor}>{assignment.instructor}</Text>
-              <Text style={styles.assignmentDeadline}>{assignment.deadline}</Text>
+              <Text style={styles.assignmentInstructor}>
+                {assignment.instructor}
+              </Text>
+              <Text style={styles.assignmentDeadline}>
+                {assignment.deadline}
+              </Text>
             </View>
             <TouchableOpacity style={styles.viewButton}>
               <Text style={styles.viewButtonText}>{assignment.status}</Text>
@@ -80,8 +91,8 @@ const AssignmentListScreen = ({ navigation }) => {
         ))}
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -153,6 +164,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "500",
   },
-})
+});
 
-export default AssignmentListScreen
+export default AssignmentListScreen;

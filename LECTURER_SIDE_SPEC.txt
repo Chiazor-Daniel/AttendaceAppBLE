@@ -1,0 +1,135 @@
+Lecturer-Side Mesh Attendance Spec (matches student app)
+
+Overview
+- Student app discovers a lecturer "session_started" broadcast via mesh, then after biometric verification, students broadcast "attendance" back on the same channel.
+- Transport: expo-bitchat mesh.
+- Channel convention: #<course>-<meetingId> (e.g., #PHY 202-2025W10).
+
+Message Schemas (must match student app)
+1) Lecturer → Students: session started
+{
+  "type": "session_started",
+  "course": "PHY 202",
+  "meetingId": "2025W10",
+  "lecturer": "Dr. Ada Lovelace",
+  "channel": "#PHY 202-2025W10",
+  "timestamp": 1730899200000,
+  "sender": "Lecturer-Ada"
+}
+
+2) Students → Lecturer: attendance
+{
+  "type": "attendance",
+  "studentId": "S-1001",
+  "studentName": "John Doe",
+  "course": "PHY 202",
+  "meetingId": "2025W10",
+  "verification": "biometric",  // or "facial" | "fingerprint" | "pin" | "unknown"
+  "timestamp": 1730899235000,
+  "status": "present",
+  "sender": "Student-1699298123456"
+}
+
+Channel Convention
+- Build channel as: "#" + course + "-" + meetingId
+- Use the same channel for both the initial "session_started" broadcast and every "attendance" message for that session.
+
+Mock Data (for cross-app testing)
+- Courses: "PHY 202", "CHM 202", "BIO 202"
+- Meeting ID: "2025W10" (readable short token or date bucket)
+- Lecturer name: "Dr. Ada Lovelace"
+- Lecturer mesh nickname: "Lecturer-Ada"
+- Sample students:
+  - { studentId: "S-1001", studentName: "John Doe" }
+  - { studentId: "S-1002", studentName: "Mary Major" }
+  - { studentId: "S-1003", studentName: "Lee Wong" }
+- Verification values: "biometric" (primary), can vary to "fingerprint"/"facial" for simulation
+
+Lecturer-Side Features to Implement
+1) Start session
+- Inputs: course (picker), auto meetingId, lecturer display name
+- Initialize mesh with nickname, e.g., "Lecturer-Ada"
+- Broadcast session_started on channel #<course>-<meetingId>
+- Optional: rebroadcast every 10–20s for discoverability
+- Show peer count and channel
+
+2) Live attendance dashboard
+- Subscribe to attendance messages
+- Deduplicate by studentId (keep first-seen or best verification)
+- Display columns: studentName, verification, timestamp
+- Counters and optional CSV export
+
+3) End session
+- Stop rebroadcast loop
+- Optionally stop mesh services
+- Persist/export attendance results
+
+4) Reliability/UX
+- Pre-flight checks (Bluetooth/location permissions, and location services enabled on Android)
+- Status indicators: service running, channel, peer count, last broadcast time
+- Error handling with retry on failures
+
+Minimal Step-by-Step Flow
+1) Initialize mesh
+- Nickname: "Lecturer-Ada"
+- Ensure Bluetooth + Location permissions and, on Android, that location services are enabled
+
+2) Start session
+- course: "PHY 202"
+- meetingId: "2025W10"
+- channel: "#PHY 202-2025W10"
+- Broadcast the following JSON (rebroadcast every ~15s optional):
+{
+  "type": "session_started",
+  "course": "PHY 202",
+  "meetingId": "2025W10",
+  "lecturer": "Dr. Ada Lovelace",
+  "channel": "#PHY 202-2025W10",
+  "timestamp": <Date.now()>,
+  "sender": "Lecturer-Ada"
+}
+
+3) Listen for attendance (accept only matching course & meetingId)
+- Deduplicate by studentId
+- Example messages will look like the attendance schema above
+
+4) End session
+- Stop rebroadcast interval
+- Unsubscribe attendance listener
+- Optional cleanup/stop services and export results
+
+Guardrails / Validations
+- Only accept attendance if course and meetingId match the current session
+- If multiple messages for the same studentId, keep the earliest timestamp (or mark as updated but do not double count)
+- If channel mismatches, ignore
+
+Portable Pseudocode (adapt as needed)
+// Start session
+await MeshService.initialize('Lecturer-Ada');
+const session = { course: 'PHY 202', meetingId: '2025W10', lecturer: 'Dr. Ada Lovelace' };
+const { channel } = await MeshService.broadcastSessionStart(session);
+const intervalId = setInterval(() => MeshService.broadcastSessionStart(session), 15000); // optional
+
+// Listen for attendance
+const attendeesById = new Map();
+const unsubscribe = MeshService.onAttendance((msg) => {
+  if (msg.type !== 'attendance') return;
+  if (msg.course !== session.course || msg.meetingId !== session.meetingId) return;
+  if (!attendeesById.has(msg.studentId)) {
+    attendeesById.set(msg.studentId, msg);
+    // update UI with Array.from(attendeesById.values())
+  }
+});
+
+// End session
+clearInterval(intervalId);
+unsubscribe?.();
+// await MeshService.cleanup(); // optional
+
+Testing Checklist
+- Lecturer starts PHY 202 with meetingId "2025W10"; channel shows as "#PHY 202-2025W10"
+- Student Join screen detects the session and peer count > 0
+- Student completes biometric; app broadcasts attendance on the same channel
+- Lecturer dashboard shows new attendee entries, deduped by studentId
+- Turning off Bluetooth/location prompts error states on both sides
+

@@ -1,13 +1,19 @@
 import React, { use } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Header = ({ name}: any) => {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+  
+  // Calculate status bar height (top inset)
+  const statusBarHeight = insets.top || (Platform.OS === 'ios' ? 44 : 24);
+  
   return (
     !name ? <View style={styles.container}>
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: statusBarHeight + 14 }]}>
         <View style={styles.profileSection}>
             <Image source={{uri: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}} style={styles.avatar} />
             <View style={styles.greeting}>
@@ -31,7 +37,7 @@ const Header = ({ name}: any) => {
             <Text style={styles.syncText}>Sync Data</Text>
             </TouchableOpacity>
         </View>
-    </View> :   <View style={styles.header2}>
+    </View> :   <View style={[styles.header2, { paddingTop: statusBarHeight + 16 }]}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Ionicons name="arrow-back" size={24} color="white" />
             </TouchableOpacity>
@@ -53,7 +59,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 14,
   },
   profileSection: {
     flexDirection: 'row',
@@ -146,7 +151,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
-    paddingTop: 50,
   },
   headerTitle: {
     color: "white",

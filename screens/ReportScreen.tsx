@@ -1,51 +1,134 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
 const ReportScreen = ({ navigation }) => {
   const attendanceData = [
-    { course: "PHY 101", mon: "present", tue: "present", wed: "present", thu: "present", fri: "present" },
-    { course: "BIO 101", mon: "present", tue: "absent", wed: "present", thu: "present", fri: "absent" },
-    { course: "CHM 101", mon: "late", tue: "present", wed: "absent", thu: "present", fri: "present" },
-    { course: "ENG 101", mon: "present", tue: "present", wed: "present", thu: "late", fri: "present" },
-    { course: "GNS 101", mon: "present", tue: "present", wed: "present", thu: "present", fri: "present" },
-    { course: "COM 101", mon: "present", tue: "absent", wed: "present", thu: "present", fri: "absent" },
-    { course: "MTH 101", mon: "late", tue: "present", wed: "absent", thu: "present", fri: "present" },
-    { course: "PHY 101", mon: "present", tue: "present", wed: "present", thu: "present", fri: "present" },
-    { course: "GNS 101", mon: "present", tue: "present", wed: "present", thu: "present", fri: "present" },
-    { course: "COM 101", mon: "present", tue: "absent", wed: "present", thu: "present", fri: "absent" },
-    { course: "MTH 101", mon: "late", tue: "present", wed: "absent", thu: "present", fri: "present" },
-  ]
+    {
+      course: "PHY 101",
+      mon: "present",
+      tue: "present",
+      wed: "present",
+      thu: "present",
+      fri: "present",
+    },
+    {
+      course: "BIO 101",
+      mon: "present",
+      tue: "absent",
+      wed: "present",
+      thu: "present",
+      fri: "absent",
+    },
+    {
+      course: "CHM 101",
+      mon: "late",
+      tue: "present",
+      wed: "absent",
+      thu: "present",
+      fri: "present",
+    },
+    {
+      course: "ENG 101",
+      mon: "present",
+      tue: "present",
+      wed: "present",
+      thu: "late",
+      fri: "present",
+    },
+    {
+      course: "GNS 101",
+      mon: "present",
+      tue: "present",
+      wed: "present",
+      thu: "present",
+      fri: "present",
+    },
+    {
+      course: "COM 101",
+      mon: "present",
+      tue: "absent",
+      wed: "present",
+      thu: "present",
+      fri: "absent",
+    },
+    {
+      course: "MTH 101",
+      mon: "late",
+      tue: "present",
+      wed: "absent",
+      thu: "present",
+      fri: "present",
+    },
+    {
+      course: "PHY 101",
+      mon: "present",
+      tue: "present",
+      wed: "present",
+      thu: "present",
+      fri: "present",
+    },
+    {
+      course: "GNS 101",
+      mon: "present",
+      tue: "present",
+      wed: "present",
+      thu: "present",
+      fri: "present",
+    },
+    {
+      course: "COM 101",
+      mon: "present",
+      tue: "absent",
+      wed: "present",
+      thu: "present",
+      fri: "absent",
+    },
+    {
+      course: "MTH 101",
+      mon: "late",
+      tue: "present",
+      wed: "absent",
+      thu: "present",
+      fri: "present",
+    },
+  ];
 
   const getStatusColor = (status) => {
     switch (status) {
       case "present":
-        return "#10b981"
+        return "#10b981";
       case "late":
-        return "#f59e0b"
+        return "#f59e0b";
       case "absent":
-        return "#ef4444"
+        return "#ef4444";
       default:
-        return "#d1d5db"
+        return "#d1d5db";
     }
-  }
+  };
 
   const getStatusIcon = (status) => {
     switch (status) {
       case "present":
-        return "✓"
+        return "✓";
       case "late":
-        return "⚠"
+        return "⚠";
       case "absent":
-        return "✕"
+        return "✕";
       default:
-        return "-"
+        return "-";
     }
-  }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-     
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Attendance Overview */}
@@ -58,15 +141,21 @@ const ReportScreen = ({ navigation }) => {
             </View>
             <View style={styles.legendContainer}>
               <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: "#10b981" }]} />
+                <View
+                  style={[styles.legendDot, { backgroundColor: "#10b981" }]}
+                />
                 <Text style={styles.legendText}>Present (68)</Text>
               </View>
               <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: "#f59e0b" }]} />
+                <View
+                  style={[styles.legendDot, { backgroundColor: "#f59e0b" }]}
+                />
                 <Text style={styles.legendText}>Late (17)</Text>
               </View>
               <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: "#ef4444" }]} />
+                <View
+                  style={[styles.legendDot, { backgroundColor: "#ef4444" }]}
+                />
                 <Text style={styles.legendText}>Absent (15)</Text>
               </View>
             </View>
@@ -85,7 +174,9 @@ const ReportScreen = ({ navigation }) => {
 
           <View style={styles.attendanceTable}>
             <View style={styles.tableHeader}>
-              <Text style={[styles.tableHeaderText, styles.courseColumn]}>Course</Text>
+              <Text style={[styles.tableHeaderText, styles.courseColumn]}>
+                Course
+              </Text>
               <Text style={styles.tableHeaderText}>MON</Text>
               <Text style={styles.tableHeaderText}>TUE</Text>
               <Text style={styles.tableHeaderText}>WED</Text>
@@ -95,10 +186,20 @@ const ReportScreen = ({ navigation }) => {
 
             {attendanceData.map((row, index) => (
               <View key={index} style={styles.tableRow}>
-                <Text style={[styles.courseText, styles.courseColumn]}>{row.course}</Text>
+                <Text style={[styles.courseText, styles.courseColumn]}>
+                  {row.course}
+                </Text>
                 {["mon", "tue", "wed", "thu", "fri"].map((day) => (
-                  <View key={day} style={[styles.statusCell, { backgroundColor: getStatusColor(row[day]) }]}>
-                    <Text style={styles.statusText}>{getStatusIcon(row[day])}</Text>
+                  <View
+                    key={day}
+                    style={[
+                      styles.statusCell,
+                      { backgroundColor: getStatusColor(row[day]) },
+                    ]}
+                  >
+                    <Text style={styles.statusText}>
+                      {getStatusIcon(row[day])}
+                    </Text>
                   </View>
                 ))}
               </View>
@@ -107,8 +208,8 @@ const ReportScreen = ({ navigation }) => {
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -261,6 +362,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "bold",
   },
-})
+});
 
-export default ReportScreen
+export default ReportScreen;

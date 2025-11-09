@@ -1,5 +1,12 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Image } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  Image,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
 const ProfileScreen = ({ navigation }) => {
   const menuItems = [
@@ -23,17 +30,18 @@ const ProfileScreen = ({ navigation }) => {
       title: "Logout",
       screen: "Splash",
     },
-  ]
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
-     
-
       <View style={styles.content}>
         {/* Profile Section */}
         <View style={styles.profileSection}>
           <View style={styles.profileImageContainer}>
-            <Image source={{ uri: "/young-woman-profile.png" }} style={styles.profileImage} />
+            <Image
+              source={{ uri: "/young-woman-profile.png" }}
+              style={styles.profileImage}
+            />
           </View>
           <Text style={styles.profileName}>Raymond Joe</Text>
           <Text style={styles.matricNumber}>MATRIC NO: 2023/09/24356</Text>
@@ -46,7 +54,11 @@ const ProfileScreen = ({ navigation }) => {
         {/* Menu Items */}
         <View style={styles.menuSection}>
           {menuItems.map((item, index) => (
-            <TouchableOpacity key={index} style={styles.menuItem} onPress={() => navigation.navigate(item.screen)}>
+            <TouchableOpacity
+              key={index}
+              style={styles.menuItem}
+              onPress={() => navigation.navigate(item.screen)}
+            >
               <View style={styles.menuItemLeft}>
                 <View style={styles.menuIconContainer}>
                   <Icon name={item.icon} size={20} color="#8B5CF6" />
@@ -59,8 +71,8 @@ const ProfileScreen = ({ navigation }) => {
         </View>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -161,6 +173,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#1f2937",
   },
-})
+});
 
-export default ProfileScreen
+export default ProfileScreen;

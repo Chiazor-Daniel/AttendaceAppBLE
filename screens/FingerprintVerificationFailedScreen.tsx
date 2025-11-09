@@ -1,5 +1,11 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
 const FingerprintVerificationFailedScreen = ({ navigation }) => {
   return (
@@ -33,13 +39,16 @@ const FingerprintVerificationFailedScreen = ({ navigation }) => {
           We were unable to capture your fingerprint properly. Please try again.
         </Text>
 
-        <TouchableOpacity style={styles.tryAgainButton} onPress={() => navigation.navigate("FingerprintScanning")}>
+        <TouchableOpacity
+          style={styles.tryAgainButton}
+          onPress={() => navigation.navigate("FingerprintScanning")}
+        >
           <Text style={styles.tryAgainButtonText}>Try Again</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -115,6 +124,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-})
+});
 
-export default FingerprintVerificationFailedScreen
+export default FingerprintVerificationFailedScreen;

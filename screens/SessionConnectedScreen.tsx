@@ -1,6 +1,13 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
-import { Image } from "react-native"
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
+
+import { Image } from "react-native";
 
 const SessionConnectedScreen = ({ navigation }: any) => {
   return (
@@ -14,13 +21,18 @@ const SessionConnectedScreen = ({ navigation }: any) => {
       {/* Network Diagram */}
       <View style={styles.networkContainer}>
         <View style={styles.networkDiagram}>
-        <Image source={require('../assets/net.png')} style={{width: 200, height: 200}} />
+          <Image
+            source={require("../assets/net.png")}
+            style={{ width: 200, height: 200 }}
+          />
         </View>
       </View>
 
       {/* Status Message */}
       <View style={styles.statusContainer}>
-        <Text style={styles.statusText}>You are connected. Class in session</Text>
+        <Text style={styles.statusText}>
+          You are connected. Class in session
+        </Text>
       </View>
 
       {/* Session Details */}
@@ -49,7 +61,9 @@ const SessionConnectedScreen = ({ navigation }: any) => {
 
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Attendance Status</Text>
-          <Text style={[styles.detailValue, styles.presentStatus]}>Present</Text>
+          <Text style={[styles.detailValue, styles.presentStatus]}>
+            Present
+          </Text>
         </View>
 
         <View style={styles.detailRow}>
@@ -59,13 +73,16 @@ const SessionConnectedScreen = ({ navigation }: any) => {
       </View>
 
       {/* Back to Home Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Dashboard")}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.navigate("Dashboard")}
+      >
         <Icon name="home" size={16} color="white" style={{ marginRight: 8 }} />
         <Text style={styles.backButtonText}>Back to Home</Text>
       </TouchableOpacity>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -173,6 +190,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-})
+});
 
-export default SessionConnectedScreen
+export default SessionConnectedScreen;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,10 +7,10 @@ import {
   SafeAreaView,
   ScrollView,
   Dimensions,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 export default function DashboardScreen({ navigation }: any) {
   const [isOnline, setIsOnline] = useState(true);
@@ -55,51 +55,89 @@ export default function DashboardScreen({ navigation }: any) {
   ];
 
   const attendanceData = [
-    { course: 'PHY 101', mon: 'present', tue: 'late', wed: 'present', thu: 'present', fri: 'present' },
-    { course: 'BIO 101', mon: 'present', tue: 'absent', wed: 'present', thu: 'present', fri: 'absent' },
-    { course: 'CHM 101', mon: 'late', tue: 'present', wed: 'absent', thu: 'present', fri: 'present' },
-    { course: 'PHS 101', mon: 'absent', tue: 'present', wed: 'absent', thu: 'absent', fri: 'present' },
+    {
+      course: "PHY 101",
+      mon: "present",
+      tue: "late",
+      wed: "present",
+      thu: "present",
+      fri: "present",
+    },
+    {
+      course: "BIO 101",
+      mon: "present",
+      tue: "absent",
+      wed: "present",
+      thu: "present",
+      fri: "absent",
+    },
+    {
+      course: "CHM 101",
+      mon: "late",
+      tue: "present",
+      wed: "absent",
+      thu: "present",
+      fri: "present",
+    },
+    {
+      course: "PHS 101",
+      mon: "absent",
+      tue: "present",
+      wed: "absent",
+      thu: "absent",
+      fri: "present",
+    },
   ];
 
   const chartData = [
-    { week: 'BIO 101', percentage: 85, color: '#8B5CF6' },
-    { week: 'PHY 101', percentage: 92, color: '#ec4899' },
-    { week: 'CHM 101', percentage: 78, color: '#1f2937' },
-    { week: 'PHS 101', percentage: 88, color: '#8B5CF6' },
-    { week: 'MTH 101', percentage: 95, color: '#ec4899' },
-    { week: 'MTH 102', percentage: 82, color: '#1f2937' },
-    { week: 'MTH 103', percentage: 90, color: '#8B5CF6' },
+    { week: "BIO 101", percentage: 85, color: "#8B5CF6" },
+    { week: "PHY 101", percentage: 92, color: "#ec4899" },
+    { week: "CHM 101", percentage: 78, color: "#1f2937" },
+    { week: "PHS 101", percentage: 88, color: "#8B5CF6" },
+    { week: "MTH 101", percentage: 95, color: "#ec4899" },
+    { week: "MTH 102", percentage: 82, color: "#1f2937" },
+    { week: "MTH 103", percentage: 90, color: "#8B5CF6" },
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'present': return '#10b981';
-      case 'late': return '#f59e0b';
-      case 'absent': return '#ef4444';
-      default: return '#d1d5db';
+      case "present":
+        return "#10b981";
+      case "late":
+        return "#f59e0b";
+      case "absent":
+        return "#ef4444";
+      default:
+        return "#d1d5db";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'present': return '✓';
-      case 'late': return '⚠';
-      case 'absent': return '✕';
-      default: return '-';
+      case "present":
+        return "✓";
+      case "late":
+        return "⚠";
+      case "absent":
+        return "✕";
+      default:
+        return "-";
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Class Cards - All four in one row */}
         <View style={styles.classRow}>
           {classes.map((classItem, index) => (
             <View key={index} style={styles.classCard}>
               <Text style={styles.classTime}>{classItem.time}</Text>
               <Text style={styles.classCode}>{classItem.code}</Text>
-              
+
               <View style={styles.statusContainer}>
                 {classItem.status === "active" ? (
                   <Text style={styles.timerText}>{classItem.statusText}</Text>
@@ -109,19 +147,26 @@ export default function DashboardScreen({ navigation }: any) {
                   <Text style={styles.absentText}>{classItem.statusText}</Text>
                 )}
               </View>
-              
+
               <TouchableOpacity
-                style={[styles.classActionButton, { 
-                  backgroundColor: classItem.buttonColor,
-                }]}
+                style={[
+                  styles.classActionButton,
+                  {
+                    backgroundColor: classItem.buttonColor,
+                  },
+                ]}
                 onPress={() => {
                   if (classItem.status !== "ended") {
-                    navigation.navigate("AttendanceSession")
+                    navigation.navigate("JoinClassSelection", {
+                      course: classItem.code,
+                    });
                   }
                 }}
                 disabled={classItem.status === "ended"}
               >
-                <Text style={styles.classActionText}>{classItem.buttonText}</Text>
+                <Text style={styles.classActionText}>
+                  {classItem.buttonText}
+                </Text>
               </TouchableOpacity>
             </View>
           ))}
@@ -133,26 +178,28 @@ export default function DashboardScreen({ navigation }: any) {
             <Text style={styles.chartTitle}>% Attendance Per Course</Text>
             <Text style={styles.weekDropdown}>Week 1 ▼</Text>
           </View>
-          
+
           <View style={styles.chartContainer}>
             <View style={styles.chartYAxis}>
               {[100, 80, 60, 40, 20, 0].map((value) => (
-                <Text key={value} style={styles.yAxisLabel}>{value}</Text>
+                <Text key={value} style={styles.yAxisLabel}>
+                  {value}
+                </Text>
               ))}
             </View>
-            
+
             <View style={styles.chartBars}>
               {chartData.map((item, index) => (
                 <View key={index} style={styles.barContainer}>
                   <View style={styles.barWrapper}>
-                    <View 
+                    <View
                       style={[
-                        styles.bar, 
-                        { 
+                        styles.bar,
+                        {
                           height: (item.percentage / 100) * 120,
-                          backgroundColor: item.color 
-                        }
-                      ]} 
+                          backgroundColor: item.color,
+                        },
+                      ]}
                     />
                   </View>
                   <Text style={styles.barLabel}>{item.week}</Text>
@@ -163,16 +210,24 @@ export default function DashboardScreen({ navigation }: any) {
 
           <View style={styles.chartLegend}>
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#8B5CF6' }]} />
+              <View
+                style={[styles.legendDot, { backgroundColor: "#8B5CF6" }]}
+              />
               <Text style={styles.legendText}>Excellent (80%+)</Text>
             </View>
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#ec4899' }]} />
+              <View
+                style={[styles.legendDot, { backgroundColor: "#ec4899" }]}
+              />
               <Text style={styles.legendText}>Good (60-79%)</Text>
             </View>
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#1f2937' }]} />
-              <Text style={styles.legendText}>Needs Improvement {'(<60%)'}</Text>
+              <View
+                style={[styles.legendDot, { backgroundColor: "#1f2937" }]}
+              />
+              <Text style={styles.legendText}>
+                Needs Improvement {"(<60%)"}
+              </Text>
             </View>
           </View>
         </View>
@@ -186,62 +241,78 @@ export default function DashboardScreen({ navigation }: any) {
 
           <View style={styles.attendanceLegend}>
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#10b981' }]} />
+              <View
+                style={[styles.legendDot, { backgroundColor: "#10b981" }]}
+              />
               <Text style={styles.legendText}>Present</Text>
             </View>
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#f59e0b' }]} />
+              <View
+                style={[styles.legendDot, { backgroundColor: "#f59e0b" }]}
+              />
               <Text style={styles.legendText}>Late</Text>
             </View>
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#ef4444' }]} />
+              <View
+                style={[styles.legendDot, { backgroundColor: "#ef4444" }]}
+              />
               <Text style={styles.legendText}>Absent</Text>
             </View>
           </View>
-          
+
           <View style={styles.attendanceTable}>
             <View style={styles.tableHeader}>
-              <Text style={[styles.tableHeaderText, styles.courseColumn]}>Course</Text>
+              <Text style={[styles.tableHeaderText, styles.courseColumn]}>
+                Course
+              </Text>
               <Text style={styles.tableHeaderText}>MON</Text>
               <Text style={styles.tableHeaderText}>TUE</Text>
               <Text style={styles.tableHeaderText}>WED</Text>
               <Text style={styles.tableHeaderText}>THUR</Text>
               <Text style={styles.tableHeaderText}>FRI</Text>
             </View>
-            
+
             {attendanceData.map((row, index) => (
               <View key={index} style={styles.tableRow}>
-                <Text style={[styles.courseText, styles.courseColumn]}>{row.course}</Text>
-                {['mon', 'tue', 'wed', 'thu', 'fri'].map((day) => (
-                  <View key={day} style={[styles.statusCell, { backgroundColor: getStatusColor(row[day]) }]}>
-                    <Text style={styles.statusText}>{getStatusIcon(row[day])}</Text>
+                <Text style={[styles.courseText, styles.courseColumn]}>
+                  {row.course}
+                </Text>
+                {["mon", "tue", "wed", "thu", "fri"].map((day) => (
+                  <View
+                    key={day}
+                    style={[
+                      styles.statusCell,
+                      { backgroundColor: getStatusColor(row[day]) },
+                    ]}
+                  >
+                    <Text style={styles.statusText}>
+                      {getStatusIcon(row[day])}
+                    </Text>
                   </View>
                 ))}
               </View>
             ))}
           </View>
-
-        
         </View>
       </ScrollView>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
-    paddingTop: 10
+    backgroundColor: "#f3f4f6",
+    paddingTop: 10,
   },
   scrollView: {
     flex: 1,
     paddingHorizontal: 12,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingTop: 16,
     paddingBottom: 8,
   },
@@ -250,33 +321,33 @@ const styles = StyleSheet.create({
   },
   greetingText: {
     fontSize: 14,
-    color: '#9ca3af',
+    color: "#9ca3af",
   },
   userName: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#1f2937',
+    fontWeight: "700",
+    color: "#1f2937",
   },
   syncButton: {
-    backgroundColor: '#8B5CF6',
-    flexDirection: 'row',
-    alignItems: 'center',
+    backgroundColor: "#8B5CF6",
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
   },
   syncText: {
-    color: 'white',
+    color: "white",
     fontSize: 12,
     marginLeft: 4,
   },
   scheduleTitle: {
     fontSize: 12,
-    color: '#6b7280',
+    color: "#6b7280",
     marginVertical: 8,
   },
   classRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 16,
     gap: 8,
   },
@@ -285,11 +356,11 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 8,
     // padding: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
     paddingTop: 10,
     alignItems: "center",
     borderWidth: 0.2,
-    borderColor: '#7303C0',
+    borderColor: "#7303C0",
   },
   classTime: {
     color: "#6b7280",
@@ -303,49 +374,49 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   statusContainer: {
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   timerText: {
-    color: '#8B5CF6',
+    color: "#8B5CF6",
     fontSize: 12,
     padding: 2,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
   },
   upNextText: {
-    color: '#1F1F1F',
+    color: "#1F1F1F",
     fontSize: 10,
-    fontWeight: '600',
-    textAlign: 'center',
-    backgroundColor: '#4167F94A',
+    fontWeight: "600",
+    textAlign: "center",
+    backgroundColor: "#4167F94A",
     padding: 2,
     marginBottom: 2,
     borderRadius: 2,
   },
   absentText: {
-    color: '#FD1D1D',
-    backgroundColor: '#FCCFCF',
+    color: "#FD1D1D",
+    backgroundColor: "#FCCFCF",
     fontSize: 10,
     padding: 2,
     marginBottom: 2,
     borderRadius: 2,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
   },
   lateText: {
-    color: '#FCCFCF',
-    backgroundColor: '#FCCFCF',
+    color: "#FCCFCF",
+    backgroundColor: "#FCCFCF",
     fontSize: 10,
     padding: 2,
     marginBottom: 2,
     borderRadius: 2,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
   },
   classActionButton: {
     paddingHorizontal: 8,
     paddingVertical: 6,
-    width: '100%',
+    width: "100%",
   },
   classActionText: {
     color: "white",
@@ -356,58 +427,58 @@ const styles = StyleSheet.create({
   chartSection: {
     paddingHorizontal: 16,
     marginBottom: 24,
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
     borderRadius: 12,
     padding: 16,
   },
   chartHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
   chartTitle: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#1f2937',
+    fontWeight: "600",
+    color: "#1f2937",
   },
   weekDropdown: {
     fontSize: 12,
-    color: '#6b7280',
+    color: "#6b7280",
   },
   chartContainer: {
-    backgroundColor: '',
+    backgroundColor: "",
     borderRadius: 8,
     padding: 16,
     marginBottom: 12,
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   chartYAxis: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     height: 120,
     marginRight: 12,
   },
   yAxisLabel: {
     fontSize: 9,
-    color: '#6b7280',
-    textAlign: 'right',
+    color: "#6b7280",
+    textAlign: "right",
     width: 20,
   },
   chartBars: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "flex-end",
     height: 120,
   },
   barContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     flex: 1,
   },
   barWrapper: {
     height: 120,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    justifyContent: "flex-end",
+    alignItems: "center",
   },
   bar: {
     width: 10,
@@ -416,19 +487,19 @@ const styles = StyleSheet.create({
   },
   barLabel: {
     fontSize: 8,
-    color: '#6b7280',
+    color: "#6b7280",
     marginTop: 4,
-    textAlign: 'center',
+    textAlign: "center",
   },
   chartLegend: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     gap: 12,
   },
   legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 4,
   },
   legendDot: {
@@ -439,80 +510,80 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 10,
-    color: '#6b7280',
+    color: "#6b7280",
   },
   attendanceSection: {
     paddingHorizontal: 16,
     marginBottom: 10,
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
     borderRadius: 12,
     padding: 16,
   },
   attendanceHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
   attendanceTitle: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#1f2937',
+    fontWeight: "600",
+    color: "#1f2937",
   },
   attendanceTable: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     padding: 16,
-    marginTop: 10
+    marginTop: 10,
     // marginBottom: 12,
   },
   tableHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 12,
     paddingBottom: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: "#e5e7eb",
   },
   tableHeaderText: {
     fontSize: 10,
-    fontWeight: '600',
-    color: '#6b7280',
+    fontWeight: "600",
+    color: "#6b7280",
     flex: 1,
-    textAlign: 'center',
+    textAlign: "center",
   },
   courseColumn: {
     flex: 1.2,
-    textAlign: 'left',
+    textAlign: "left",
   },
   tableRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
   },
   courseText: {
     fontSize: 10,
-    fontWeight: '500',
-    color: '#1f2937',
+    fontWeight: "500",
+    color: "#1f2937",
     flex: 1,
-    textAlign: 'center',
+    textAlign: "center",
   },
   statusCell: {
     width: 15,
     height: 25,
     borderRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     flex: 1,
     marginHorizontal: 1,
   },
   statusText: {
     fontSize: 11,
     fontWeight: "600",
-    color: 'white',
+    color: "white",
   },
   attendanceLegend: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
 });

@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import Transport from "./src/services/BleTransport";
-import DeviceInfo from "react-native-device-info";
 import SplashScreen from "./screens/SplashScreen";
 import LogoScreen from "./screens/LogoScreen";
 import SignUpScreen from "./screens/SignUpScreen";
@@ -27,6 +25,7 @@ import SessionOverScreen from "./screens/SessionOverScreen";
 
 // New biometric screens
 import JoinClassSelectionScreen from "./screens/JoinClassSelectionScreen";
+import BiometricAuthScreen from "./screens/BiometricAuthScreen";
 import FacialRecognitionSetupScreen from "./screens/FacialRecognitionSetupScreen";
 import FacialDetectionScanningScreen from "./screens/FacialDetectionScanningScreen";
 import FacialDetectionSuccessScreen from "./screens/FacialDetectionSuccessScreen";
@@ -55,6 +54,7 @@ import CalendarUpcomingScreen from "./screens/CalendarUpcomingScreen";
 import { CardStyleInterpolators } from "@react-navigation/stack";
 import Header from "./components/header";
 import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const Stack = createStackNavigator();
 
@@ -98,32 +98,17 @@ const hiddenHeaderScreens = [
   "SessionOver",
 
   // Class join flow
-  "JoinClassSelection",
   "Notification",
 ];
 
 export default function App() {
-  useEffect(() => {
-    const initTransport = async () => {
-      try {
-        await new Promise(r => setTimeout(r, 1000)); // 👈 wait for activity
-        const uniqueId = await DeviceInfo.getUniqueId();
-        const nickname = `S-${uniqueId}`;
-        await Transport.start(nickname);
-        console.log(`✅ Transport started as: ${nickname}`);
-      } catch (error) {
-        console.error('Failed to start Transport:', error);
-      }
-    };
 
-    initTransport();
-    return () => Transport.stop();
-  }, []);
 
   return (
-    <NavigationContainer>
-      <StatusBar style="auto" />
-      <Stack.Navigator
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <StatusBar style="auto" />
+        <Stack.Navigator
         screenOptions={{
           headerShown: false,
           cardStyleInterpolator: CardStyleInterpolators.forNoAnimation,
@@ -143,7 +128,8 @@ export default function App() {
           />
         ))}
       </Stack.Navigator>
-    </NavigationContainer>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
 
@@ -191,6 +177,7 @@ const screens = [
 
   // New biometric screens
   { name: "JoinClassSelection", component: JoinClassSelectionScreen },
+  { name: "BiometricAuth", component: BiometricAuthScreen },
   { name: "FacialRecognitionSetup", component: FacialRecognitionSetupScreen },
   { name: "FacialDetectionScanning", component: FacialDetectionScanningScreen },
   { name: "FacialDetectionSuccess", component: FacialDetectionSuccessScreen },
