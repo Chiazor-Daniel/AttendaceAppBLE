@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, StyleSheet } from 'react-native';
 import DashboardScreen from '../screens/DashboardScreen';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import ReportScreen from '../screens/ReportScreen';
 import AssignmentListScreen from '../screens/AssignmentListScreen';
 import CalendarScreen from '../screens/CalendarScreen';

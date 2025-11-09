@@ -1,5 +1,12 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
 const CalendarUpcomingScreen = ({ navigation }) => {
   const upcomingEvents = [
@@ -51,29 +58,51 @@ const CalendarUpcomingScreen = ({ navigation }) => {
       location: "Venue: Cooperative Building",
       color: "#8B5CF6",
     },
-  ]
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
-     
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Calendar</Text>
+        <View style={{ width: 24 }} />
+      </View>
 
       <View style={styles.content}>
         <Text style={styles.upcomingTitle}>Upcoming Events</Text>
-        <ScrollView style={styles.upcomingList} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.upcomingList}
+          showsVerticalScrollIndicator={false}
+        >
           {upcomingEvents.map((event, index) => (
-            <View key={index} style={[styles.upcomingEventItem, { backgroundColor: event.color }]}>
+            <View
+              key={index}
+              style={[
+                styles.upcomingEventItem,
+                { backgroundColor: event.color },
+              ]}
+            >
               <Text style={styles.upcomingEventTitle}>{event.title}</Text>
               <Text style={styles.upcomingEventSubtitle}>{event.subtitle}</Text>
               <Text style={styles.upcomingEventDate}>{event.date}</Text>
-              {event.time && <Text style={styles.upcomingEventTime}>{event.time}</Text>}
-              {event.location && <Text style={styles.upcomingEventLocation}>{event.location}</Text>}
+              {event.time && (
+                <Text style={styles.upcomingEventTime}>{event.time}</Text>
+              )}
+              {event.location && (
+                <Text style={styles.upcomingEventLocation}>
+                  {event.location}
+                </Text>
+              )}
             </View>
           ))}
         </ScrollView>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -96,9 +125,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "white",
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 50,
   },
   upcomingTitle: {
     fontSize: 18,
@@ -143,6 +172,6 @@ const styles = StyleSheet.create({
     color: "white",
     opacity: 0.9,
   },
-})
+});
 
-export default CalendarUpcomingScreen
+export default CalendarUpcomingScreen;

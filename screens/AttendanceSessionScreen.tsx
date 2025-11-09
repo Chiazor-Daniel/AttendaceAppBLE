@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,75 +6,86 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
-  ActivityIndicator,
-  RefreshControl,
-} from 'react-native';
-import Transport from '../src/services/BleTransport';
-import { Ionicons } from '@expo/vector-icons';
-
-interface SessionAd {
-  meetingId: string;
-  courseCode: string;
-  duration?: number;
-  window?: number;
-  timestamp: number;
-}
+  Switch,
+  Alert,
+} from "react-native";
+import BleService, { SessionInfo } from "../services/BleService";
+import { State } from "react-native-ble-plx";
 
 const AttendanceSessionScreen = ({ navigation }: any) => {
-  const [ads, setAds] = useState<SessionAd[]>([]);
-  const [isScanning, setIsScanning] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const [isOnlineMode, setIsOnlineMode] = useState(false);
+  const [availableSessions, setAvailableSessions] = useState<SessionInfo[]>([]);
+  const [scanning, setScanning] = useState(false);
+  const [bluetoothState, setBluetoothState] = useState<State>("Unknown");
 
-  // Listen for att:advertise messages
   useEffect(() => {
-    const handleMessage = (m: any) => {
-      if (m.type === 'att:advertise') {
-        console.log('📡 Received session ad:', m);
-        setAds((prevAds) => {
-          // Remove old entries with same meetingId and add new one
-          const filtered = prevAds.filter((x) => x.meetingId !== m.meetingId);
-          return [
-            ...filtered,
-            {
-              meetingId: m.meetingId,
-              courseCode: m.courseCode,
-              duration: m.duration,
-              window: m.window,
-              timestamp: Date.now(),
-            },
-          ];
-        });
-        setIsScanning(false);
-      }
-    };
+    // Monitor Bluetooth state changes
+    const subscription = BleService.manager.onStateChange((state) => {
+      console.log("Bluetooth state changed:", state);
+      setBluetoothState(state);
 
-    if (Transport.isActive()) {
-      Transport.on('m', handleMessage);
-      console.log('🔍 Started scanning for attendance sessions...');
-    } else {
-      console.warn('⚠️ Transport not active, cannot scan for sessions');
-      setIsScanning(false);
-    }
+      if (state !== "PoweredOn" && isOnlineMode) {
+        setIsOnlineMode(false);
+        BleService.stopScan();
+        Alert.alert(
+          "Bluetooth Error",
+          "Please enable Bluetooth to scan for sessions",
+        );
+      }
+    }, true);
 
     return () => {
-      Transport.off('m', handleMessage);
+      subscription.remove();
+      BleService.stopScan();
     };
-  }, []);
+  }, [isOnlineMode]);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    setAds([]);
-    setIsScanning(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
+  const handleOnlineModeToggle = async (value: boolean) => {
+    if (value && bluetoothState !== "PoweredOn") {
+      Alert.alert(
+        "Bluetooth Required",
+        "Please enable Bluetooth to scan for sessions",
+      );
+      return;
+    }
+
+    setIsOnlineMode(value);
+    if (value) {
+      try {
+        setScanning(true);
+        BleService.scanForSessions((session) => {
+          setAvailableSessions((prev) => {
+            if (!prev.find((s) => s.id === session.id)) {
+              return [...prev, session];
+            }
+            return prev;
+          });
+        });
+      } catch (error: any) {
+        Alert.alert("Error", error.message);
+        setIsOnlineMode(false);
+      }
+    } else {
+      BleService.stopScan();
+      setScanning(false);
+      setAvailableSessions([]);
+    }
   };
 
-  const handleSelectSession = (session: SessionAd) => {
-    navigation.navigate('JoinClassSelection', {
-      meetingId: session.meetingId,
-      courseCode: session.courseCode,
-    });
+  const handleSessionSelect = async (session: SessionInfo) => {
+    try {
+      if (bluetoothState !== "PoweredOn") {
+        throw new Error("Bluetooth must be enabled to connect to a session");
+      }
+      const device = await BleService.connectToSession(session.id);
+      navigation.navigate("JoinClassSelection", {
+        device,
+        meetingId: session.meetingId,
+        courseCode: session.courseCode,
+      });
+    } catch (error: any) {
+      Alert.alert("Connection Error", error.message);
+    }
   };
 
   return (
@@ -82,71 +93,84 @@ const AttendanceSessionScreen = ({ navigation }: any) => {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
       >
+        {/* Session Details */}
         <View style={styles.sessionSection}>
-          <Text style={styles.sessionTitle}>Available Sessions</Text>
+          <Text style={styles.sessionTitle}>Attendance Session</Text>
 
           <Text style={styles.sessionDescription}>
-            Select an available class session to join. Sessions are discovered via Bluetooth from nearby lecturers.
+            Join class session with the meeting ID provided by the lecturer.
+            Meeting ID expires after every session. Your attendance is being
+            saved in the background and will be synced once internet connection
+            is back.
           </Text>
 
-          {isScanning && ads.length === 0 && (
-            <View style={styles.scanningContainer}>
-              <ActivityIndicator size="large" color="#8B5CF6" />
-              <Text style={styles.scanningText}>Scanning for sessions...</Text>
-              <Text style={styles.scanningHint}>
-                Make sure Bluetooth is ON and lecturer has started a session
-              </Text>
-            </View>
-          )}
+          <View style={styles.detailsContainer}>
+            {!isOnlineMode ? (
+              <>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Meeting ID</Text>
+                  <Text style={styles.detailValue}>Type in meeting ID</Text>
+                </View>
 
-          {ads.length === 0 && !isScanning && (
-            <View style={styles.emptyContainer}>
-              <Ionicons name="search-outline" size={64} color="#d1d5db" />
-              <Text style={styles.emptyText}>No sessions found</Text>
-              <Text style={styles.emptySubtext}>
-                Pull down to refresh and scan again
-              </Text>
-            </View>
-          )}
-
-          {ads.length > 0 && (
-            <View style={styles.sessionsList}>
-              {ads.map((session, index) => (
-                <TouchableOpacity
-                  key={`${session.meetingId}-${index}`}
-                  style={styles.sessionCard}
-                  onPress={() => handleSelectSession(session)}
-                >
-                  <View style={styles.sessionCardHeader}>
-                    <View style={styles.courseBadge}>
-                      <Text style={styles.courseCode}>{session.courseCode}</Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={20} color="#8B5CF6" />
-                  </View>
-                  <View style={styles.sessionCardDetails}>
-                    <View style={styles.sessionDetailRow}>
-                      <Text style={styles.sessionDetailLabel}>Meeting ID:</Text>
-                      <Text style={styles.sessionDetailValue}>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Course</Text>
+                  <Text style={styles.detailValue}>Input course code</Text>
+                </View>
+              </>
+            ) : (
+              <>
+                {availableSessions.map((session) => (
+                  <TouchableOpacity
+                    key={session.id}
+                    style={styles.sessionItem}
+                    onPress={() => handleSessionSelect(session)}
+                  >
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Meeting ID</Text>
+                      <Text style={styles.detailValue}>
                         {session.meetingId}
                       </Text>
                     </View>
-                    {session.duration && (
-                      <View style={styles.sessionDetailRow}>
-                        <Text style={styles.sessionDetailLabel}>Duration:</Text>
-                        <Text style={styles.sessionDetailValue}>
-                          {session.duration} min
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-                </TouchableOpacity>
-              ))}
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Course</Text>
+                      <Text style={styles.detailValue}>
+                        {session.courseCode}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+                {scanning && availableSessions.length === 0 && (
+                  <Text style={styles.scanningText}>
+                    Scanning for available sessions...
+                  </Text>
+                )}
+              </>
+            )}
+
+            <View style={styles.switchRow}>
+              <Text style={styles.switchLabel}>Switch to online mode</Text>
+              <Switch
+                value={isOnlineMode}
+                onValueChange={handleOnlineModeToggle}
+                trackColor={{ false: "#d1d5db", true: "#8B5CF6" }}
+                thumbColor={isOnlineMode ? "#ffffff" : "#ffffff"}
+              />
             </View>
-          )}
+          </View>
+
+          <TouchableOpacity
+            style={[
+              styles.joinButton,
+              !isOnlineMode && styles.joinButtonEnabled,
+            ]}
+            onPress={() =>
+              isOnlineMode ? null : navigation.navigate("JoinClassSelection")
+            }
+            disabled={isOnlineMode}
+          >
+            <Text style={styles.joinButtonText}>Join Session</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -156,78 +180,11 @@ const AttendanceSessionScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
-    paddingTop: 20,
+    backgroundColor: "#f3f4f6",
+    paddingTop: 50,
   },
   scrollView: {
     flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
-  },
-  profileSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#8B5CF6',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  avatarText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
-  greeting: {
-    flex: 1,
-  },
-  greetingText: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 2,
-  },
-  userName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1f2937',
-  },
-  syncButton: {
-    backgroundColor: '#8B5CF6',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  syncIcon: {
-    color: 'white',
-    fontSize: 12,
-    marginRight: 4,
-  },
-  syncText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  statusSection: {
-    paddingHorizontal: 20,
-    marginBottom: 24,
-    alignItems: 'center',
-  },
-  statusText: {
-    fontSize: 14,
-    color: '#6b7280',
   },
   sessionSection: {
     paddingHorizontal: 20,
@@ -235,128 +192,81 @@ const styles = StyleSheet.create({
   },
   sessionTitle: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#1f2937',
+    fontWeight: "700",
+    color: "#1f2937",
     marginBottom: 16,
   },
   sessionDescription: {
     fontSize: 14,
-    color: '#6b7280',
+    color: "#6b7280",
     lineHeight: 20,
     marginBottom: 32,
   },
   detailsContainer: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     padding: 20,
     marginBottom: 32,
   },
   detailRow: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   detailLabel: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#1f2937',
+    fontWeight: "600",
+    color: "#1f2937",
     marginBottom: 8,
   },
   detailValue: {
     fontSize: 14,
-    color: '#6b7280',
+    color: "#6b7280",
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#f9fafb',
+    backgroundColor: "#f9fafb",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: "#e5e7eb",
   },
-  scanningContainer: {
-    alignItems: 'center',
-    paddingVertical: 40,
-    marginTop: 20,
-  },
-  scanningText: {
-    fontSize: 16,
-    color: '#8B5CF6',
-    fontWeight: '600',
-    marginTop: 16,
-  },
-  scanningHint: {
-    fontSize: 12,
-    color: '#6b7280',
-    marginTop: 8,
-    textAlign: 'center',
-    paddingHorizontal: 20,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    paddingVertical: 60,
-    marginTop: 20,
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginTop: 16,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  sessionsList: {
-    marginTop: 20,
-  },
-  sessionCard: {
-    backgroundColor: 'white',
+  sessionItem: {
+    backgroundColor: "#f3f4f6",
     borderRadius: 12,
     padding: 16,
-    marginBottom: 12,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    borderColor: "#e5e7eb",
   },
-  sessionCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
+  switchRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 16,
   },
-  courseBadge: {
-    backgroundColor: '#8B5CF6',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+  switchLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#1f2937",
   },
-  courseCode: {
-    color: 'white',
+  joinButton: {
+    backgroundColor: "#8B5CF6",
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    opacity: 0.5,
+  },
+  joinButtonEnabled: {
+    opacity: 1,
+  },
+  joinButtonText: {
+    color: "white",
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "600",
+    letterSpacing: 0.5,
   },
-  sessionCardDetails: {
-    gap: 8,
-  },
-  sessionDetailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  sessionDetailLabel: {
-    fontSize: 12,
-    color: '#6b7280',
-    marginRight: 8,
-  },
-  sessionDetailValue: {
-    fontSize: 12,
-    color: '#1f2937',
-    fontWeight: '500',
+  scanningText: {
+    textAlign: "center",
+    color: "#6b7280",
+    fontSize: 14,
+    marginTop: 8,
   },
 });
 

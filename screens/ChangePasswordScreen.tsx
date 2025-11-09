@@ -1,29 +1,56 @@
-"use client"
+"use client";
 
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, TextInput } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
-import { useState } from "react"
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  TextInput,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
+
+import { useState } from "react";
 
 const ChangePasswordScreen = ({ navigation }) => {
-  const [showOldPassword, setShowOldPassword] = useState(false)
-  const [showNewPassword, setShowNewPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
-     
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Change Password</Text>
+        <View style={{ width: 24 }} />
+      </View>
 
       <View style={styles.content}>
-        <Text style={styles.description}>Enter your old password and input the new password you want.</Text>
+        <Text style={styles.description}>
+          Enter your old password and input the new password you want.
+        </Text>
 
         <View style={styles.formSection}>
           {/* Old Password */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Old Password</Text>
             <View style={styles.inputContainer}>
-              <TextInput style={styles.textInput} placeholder="••••••••••••" secureTextEntry={!showOldPassword} />
-              <TouchableOpacity onPress={() => setShowOldPassword(!showOldPassword)}>
-                <Icon name={showOldPassword ? "eye-outline" : "eye-off-outline"} size={20} color="#6b7280" />
+              <TextInput
+                style={styles.textInput}
+                placeholder="••••••••••••"
+                secureTextEntry={!showOldPassword}
+              />
+              <TouchableOpacity
+                onPress={() => setShowOldPassword(!showOldPassword)}
+              >
+                <Icon
+                  name={showOldPassword ? "eye-outline" : "eye-off-outline"}
+                  size={20}
+                  color="#6b7280"
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -32,9 +59,19 @@ const ChangePasswordScreen = ({ navigation }) => {
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>New Password</Text>
             <View style={styles.inputContainer}>
-              <TextInput style={styles.textInput} placeholder="••••••••••••" secureTextEntry={!showNewPassword} />
-              <TouchableOpacity onPress={() => setShowNewPassword(!showNewPassword)}>
-                <Icon name={showNewPassword ? "eye-outline" : "eye-off-outline"} size={20} color="#6b7280" />
+              <TextInput
+                style={styles.textInput}
+                placeholder="••••••••••••"
+                secureTextEntry={!showNewPassword}
+              />
+              <TouchableOpacity
+                onPress={() => setShowNewPassword(!showNewPassword)}
+              >
+                <Icon
+                  name={showNewPassword ? "eye-outline" : "eye-off-outline"}
+                  size={20}
+                  color="#6b7280"
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -43,21 +80,34 @@ const ChangePasswordScreen = ({ navigation }) => {
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Confirm Password</Text>
             <View style={styles.inputContainer}>
-              <TextInput style={styles.textInput} placeholder="••••••••••••" secureTextEntry={!showConfirmPassword} />
-              <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                <Icon name={showConfirmPassword ? "eye-outline" : "eye-off-outline"} size={20} color="#6b7280" />
+              <TextInput
+                style={styles.textInput}
+                placeholder="••••••••••••"
+                secureTextEntry={!showConfirmPassword}
+              />
+              <TouchableOpacity
+                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <Icon
+                  name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
+                  size={20}
+                  color="#6b7280"
+                />
               </TouchableOpacity>
             </View>
           </View>
         </View>
 
-        <TouchableOpacity style={styles.saveButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.saveButton}
+          onPress={() => navigation.goBack()}
+        >
           <Text style={styles.saveButtonText}>Save Password</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -130,6 +180,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-})
+});
 
-export default ChangePasswordScreen
+export default ChangePasswordScreen;

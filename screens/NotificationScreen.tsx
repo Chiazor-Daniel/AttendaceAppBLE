@@ -1,5 +1,12 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
 const NotificationScreen = ({ navigation }) => {
   const notifications = [
@@ -90,7 +97,7 @@ const NotificationScreen = ({ navigation }) => {
         },
       ],
     },
-  ]
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -114,13 +121,21 @@ const NotificationScreen = ({ navigation }) => {
                 </View>
                 <View style={styles.notificationContent}>
                   <View style={styles.notificationHeader}>
-                    <Text style={styles.notificationTitle}>{notification.title}</Text>
-                    <Text style={styles.notificationTime}>{notification.time}</Text>
+                    <Text style={styles.notificationTitle}>
+                      {notification.title}
+                    </Text>
+                    <Text style={styles.notificationTime}>
+                      {notification.time}
+                    </Text>
                   </View>
-                  <Text style={styles.notificationDescription}>{notification.description}</Text>
+                  <Text style={styles.notificationDescription}>
+                    {notification.description}
+                  </Text>
                 </View>
                 <TouchableOpacity style={styles.actionButton}>
-                  <Text style={styles.actionButtonText}>{notification.type}</Text>
+                  <Text style={styles.actionButtonText}>
+                    {notification.type}
+                  </Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -128,8 +143,8 @@ const NotificationScreen = ({ navigation }) => {
         ))}
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -143,7 +158,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
-    paddingTop: 30,
+    paddingTop: 50,
   },
   headerTitle: {
     color: "white",
@@ -156,7 +171,7 @@ const styles = StyleSheet.create({
   },
   section: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 50,
   },
   sectionTitle: {
     fontSize: 16,
@@ -217,6 +232,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "500",
   },
-})
+});
 
-export default NotificationScreen
+export default NotificationScreen;

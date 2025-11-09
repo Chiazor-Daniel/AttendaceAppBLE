@@ -4,30 +4,26 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-} from 'react-native';
-import { Ionicons as Icon } from '@expo/vector-icons';
+  Alert,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
-const JoinClassSelectionScreen = ({ navigation, route }: any) => {
-  const { meetingId, courseCode } = route.params || {};
+import BleService from "../services/BleService";
 
+const JoinClassSelectionScreen = ({ route, navigation }: any) => {
+  const { device, meetingId, courseCode } = route.params || {};
   const verificationOptions = [
     {
-      title: 'Facial Recognition',
-      icon: 'person',
-      screen: 'FacialRecognitionSetup',
-      params: { meetingId, courseCode, isClass: true },
+      title: "Facial Recognition",
+      icon: "person",
+      screen: "FacialRecognitionSetup",
+      params: { device, meetingId, courseCode },
     },
     {
-      title: 'Fingerprint Scan',
-      icon: 'finger-print',
-      screen: 'FingerprintCapture',
-      params: { meetingId, courseCode, isClass: true },
-    },
-    {
-      title: 'PIN Verification',
-      icon: 'lock-closed',
-      screen: 'PinInput',
-      params: { meetingId, courseCode, isClass: true },
+      title: "Fingerprint Scan",
+      icon: "finger-print",
+      screen: "FingerprintCapture",
+      params: { device, meetingId, courseCode, isClass: true },
     },
   ];
 
@@ -35,11 +31,9 @@ const JoinClassSelectionScreen = ({ navigation, route }: any) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Join Class session</Text>
-        {courseCode && (
-          <Text style={styles.courseLabel}>{courseCode}</Text>
-        )}
         <Text style={styles.subtitle}>
-          Verify your identity using any of these verification methods
+          Verify your identity using any of these verification methods for
+          course {courseCode}
         </Text>
 
         <View style={styles.optionsContainer}>
@@ -48,7 +42,16 @@ const JoinClassSelectionScreen = ({ navigation, route }: any) => {
               key={index}
               style={styles.optionButton}
               onPress={() => {
-                navigation.navigate(option.screen, option.params || {});
+                try {
+                  if (option.params) {
+                    navigation.navigate(option.screen, option.params);
+                  } else {
+                    navigation.navigate(option.screen);
+                  }
+                } catch (error) {
+                  Alert.alert("Error", "Failed to start verification process");
+                  BleService.disconnectCurrentSession();
+                }
               }}
             >
               <View style={styles.optionIcon}>
@@ -59,6 +62,14 @@ const JoinClassSelectionScreen = ({ navigation, route }: any) => {
             </TouchableOpacity>
           ))}
         </View>
+
+        {/* Optional: Start Verification button (goes to facial with isClass if needed) */}
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={() => navigation.navigate("FacialRecognitionSetup")}
+        >
+          <Text style={styles.startButtonText}>Start Verification</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -67,7 +78,7 @@ const JoinClassSelectionScreen = ({ navigation, route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
   },
   content: {
     flex: 1,
@@ -76,19 +87,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: '700',
-    color: '#1f2937',
-    marginBottom: 8,
-  },
-  courseLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#8B5CF6',
+    fontWeight: "700",
+    color: "#1f2937",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    color: '#6b7280',
+    color: "#6b7280",
     marginBottom: 40,
     lineHeight: 20,
   },
@@ -96,13 +101,13 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   optionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "white",
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 1,
@@ -115,29 +120,29 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f3f4f6',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#f3f4f6",
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 16,
   },
   optionText: {
     flex: 1,
     fontSize: 16,
-    fontWeight: '500',
-    color: '#1f2937',
+    fontWeight: "500",
+    color: "#1f2937",
   },
   startButton: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: "#8B5CF6",
     paddingVertical: 16,
     borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 'auto',
+    alignItems: "center",
+    marginTop: "auto",
     marginBottom: 20,
   },
   startButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
 

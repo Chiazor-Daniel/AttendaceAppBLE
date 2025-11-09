@@ -1,19 +1,29 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
-import { useState } from "react"
+"use client";
 
-const CalendarScreen = ({ navigation }: any) => {
-  const [selectedDate, setSelectedDate] = useState(10)
-  const [activeTab, setActiveTab] = useState("Events")
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
-  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+import { useState } from "react";
+
+const CalendarScreen = ({ navigation }) => {
+  const [selectedDate, setSelectedDate] = useState(10);
+  const [activeTab, setActiveTab] = useState("Events");
+
+  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const calendarDays = [
     [null, null, 1, 2, 3, 4, 5],
     [6, 7, 8, 9, 10, 11, 12],
     [13, 14, 15, 16, 17, 18, 19],
     [20, 21, 22, 23, 24, 25, 26],
     [27, 28, 29, 30, null, null, null],
-  ]
+  ];
 
   const events = [
     {
@@ -35,7 +45,7 @@ const CalendarScreen = ({ navigation }: any) => {
       time: "09:00 am",
       color: "#8B5CF6",
     },
-  ]
+  ];
 
   const lectures = [
     {
@@ -64,7 +74,7 @@ const CalendarScreen = ({ navigation }: any) => {
       time: "09:00 am",
       color: "#8B5CF6",
     },
-  ]
+  ];
 
   const mthEvents = [
     {
@@ -95,7 +105,7 @@ const CalendarScreen = ({ navigation }: any) => {
       time: "03:00 pm",
       color: "#8B5CF6",
     },
-  ]
+  ];
 
   const upcomingEvents = [
     {
@@ -146,20 +156,20 @@ const CalendarScreen = ({ navigation }: any) => {
       location: "Venue: Cooperative Building",
       color: "#8B5CF6",
     },
-  ]
+  ];
 
   const getCurrentEvents = () => {
     switch (activeTab) {
       case "Events":
-        return events
+        return events;
       case "Lectures":
-        return lectures
+        return lectures;
       case "Reminder":
-        return mthEvents
+        return mthEvents;
       default:
-        return events
+        return events;
     }
-  }
+  };
 
   const renderCalendarView = () => (
     <View style={styles.calendarContainer}>
@@ -190,11 +200,21 @@ const CalendarScreen = ({ navigation }: any) => {
             {week.map((day, dayIndex) => (
               <TouchableOpacity
                 key={dayIndex}
-                style={[styles.calendarDay, day === selectedDate && styles.selectedDay]}
+                style={[
+                  styles.calendarDay,
+                  day === selectedDate && styles.selectedDay,
+                ]}
                 onPress={() => day && setSelectedDate(day)}
               >
                 {day && (
-                  <Text style={[styles.calendarDayText, day === selectedDate && styles.selectedDayText]}>{day}</Text>
+                  <Text
+                    style={[
+                      styles.calendarDayText,
+                      day === selectedDate && styles.selectedDayText,
+                    ]}
+                  >
+                    {day}
+                  </Text>
                 )}
               </TouchableOpacity>
             ))}
@@ -210,7 +230,14 @@ const CalendarScreen = ({ navigation }: any) => {
             style={[styles.tab, activeTab === tab && styles.activeTab]}
             onPress={() => setActiveTab(tab)}
           >
-            <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>{tab}</Text>
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === tab && styles.activeTabText,
+              ]}
+            >
+              {tab}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -218,53 +245,85 @@ const CalendarScreen = ({ navigation }: any) => {
       {/* Selected Date Events */}
       <View style={styles.eventsHeader}>
         <Text style={styles.eventsTitle}>Thur, April {selectedDate}</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("CalendarUpcoming")}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("CalendarUpcoming")}
+        >
           <Text style={styles.viewAllText}>View all</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.eventsList} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.eventsList}
+        showsVerticalScrollIndicator={false}
+      >
         {getCurrentEvents().map((event, index) => (
-          <View key={index} style={[styles.eventItem, { borderLeftColor: event.color }]}>
+          <View
+            key={index}
+            style={[styles.eventItem, { borderLeftColor: event.color }]}
+          >
             <Text style={styles.eventTitle}>{event.title}</Text>
-            {event.subtitle && <Text style={styles.eventSubtitle}>{event.subtitle}</Text>}
+            {event.subtitle && (
+              <Text style={styles.eventSubtitle}>{event.subtitle}</Text>
+            )}
             <Text style={styles.eventLocation}>{event.location}</Text>
             <View style={styles.eventTimeContainer}>
-              <Text style={[styles.eventTime, { backgroundColor: event.color }]}>{event.time}</Text>
+              <Text
+                style={[styles.eventTime, { backgroundColor: event.color }]}
+              >
+                {event.time}
+              </Text>
             </View>
           </View>
         ))}
       </ScrollView>
     </View>
-  )
+  );
 
   const renderUpcomingView = () => (
     <View style={styles.upcomingContainer}>
       <Text style={styles.upcomingTitle}>Upcoming Events</Text>
-      <ScrollView style={styles.upcomingList} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.upcomingList}
+        showsVerticalScrollIndicator={false}
+      >
         {upcomingEvents.map((event, index) => (
-          <View key={index} style={[styles.upcomingEventItem, { backgroundColor: event.color }]}>
+          <View
+            key={index}
+            style={[styles.upcomingEventItem, { backgroundColor: event.color }]}
+          >
             <Text style={styles.upcomingEventTitle}>{event.title}</Text>
             <Text style={styles.upcomingEventSubtitle}>{event.subtitle}</Text>
             <Text style={styles.upcomingEventDate}>{event.date}</Text>
-            {event.time && <Text style={styles.upcomingEventTime}>{event.time}</Text>}
-            {event.location && <Text style={styles.upcomingEventLocation}>{event.location}</Text>}
+            {event.time && (
+              <Text style={styles.upcomingEventTime}>{event.time}</Text>
+            )}
+            {event.location && (
+              <Text style={styles.upcomingEventLocation}>{event.location}</Text>
+            )}
           </View>
         ))}
       </ScrollView>
     </View>
-  )
+  );
 
   return (
     <SafeAreaView style={styles.container}>
-      
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Calendar</Text>
+        <View style={{ width: 24 }} />
+      </View>
 
-      {navigation.getState().routes[navigation.getState().index].name === "CalendarUpcoming"
+      {navigation.getState().routes[navigation.getState().index].name ===
+      "CalendarUpcoming"
         ? renderUpcomingView()
         : renderCalendarView()}
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -287,9 +346,9 @@ const styles = StyleSheet.create({
   },
   calendarContainer: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "white",
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 50,
   },
   calendarHeader: {
     flexDirection: "row",
@@ -420,7 +479,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 50,
   },
   upcomingTitle: {
     fontSize: 18,
@@ -465,6 +524,6 @@ const styles = StyleSheet.create({
     color: "white",
     opacity: 0.9,
   },
-})
+});
 
-export default CalendarScreen
+export default CalendarScreen;

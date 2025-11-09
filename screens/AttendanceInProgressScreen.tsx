@@ -1,139 +1,215 @@
-import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  ScrollView,
+  Alert,
   ActivityIndicator,
-} from 'react-native';
-import Transport from '../src/services/BleTransport';
-import DeviceInfo from 'react-native-device-info';
-import { Ionicons } from '@expo/vector-icons';
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
-type AttendanceStatus = 'waiting' | 'present' | 'late';
+import { useEffect, useState, useCallback } from "react";
+import BackgroundTimer from "react-native-background-timer";
+import Clipboard from "@react-native-clipboard/clipboard";
+import SessionManager from "../services/SessionManager";
+import { AttendanceData } from "../types/session";
 
-const AttendanceInProgressScreen = ({ navigation, route }: any) => {
-  const { meetingId, courseCode, timeJoined } = route.params || {
-    meetingId: 'N/A',
-    courseCode: 'N/A',
-    timeJoined: new Date().toLocaleTimeString(),
-  };
+const AttendanceInProgressScreen = ({ navigation, route }) => {
+  const { courseCode, duration, attendanceWindow, sessionStarts } =
+    route.params;
+  const [sessionManager] = useState(() => new SessionManager());
+  const [sessionId, setSessionId] = useState("");
+  const [attendees, setAttendees] = useState<AttendanceData[]>([]);
+  const [remainingTime, setRemainingTime] = useState(duration * 60);
+  const [remainingWindow, setRemainingWindow] = useState(attendanceWindow * 60);
+  const [isOnline, setIsOnline] = useState(true);
+  const [isEnding, setIsEnding] = useState(false);
 
-  const [status, setStatus] = useState<AttendanceStatus>('waiting');
-  const [deviceId, setDeviceId] = useState<string>('');
-
-  // Get device ID on mount
   useEffect(() => {
-    DeviceInfo.getUniqueId().then(setDeviceId);
-  }, []);
-
-  // Listen for att:ack and att:end messages
-  useEffect(() => {
-    if (!Transport.isActive()) {
-      console.warn('⚠️ Transport not active');
-      return;
-    }
-
-    const handleMessage = (m: any) => {
-      if (m.type === 'att:ack' && m.senderId === deviceId && m.meetingId === meetingId) {
-        console.log('✅ Received attendance acknowledgment:', m);
-        setStatus(m.status === 'late' ? 'late' : 'present');
-      }
-
-      if (m.type === 'att:end' && m.meetingId === meetingId) {
-        console.log('📢 Session ended by lecturer');
-        navigation.replace('SessionOver', {
-          meetingId,
+    const initializeSession = async () => {
+      try {
+        const session = await sessionManager.startSession(
           courseCode,
-          status,
-        });
+          duration,
+          attendanceWindow,
+        );
+        setSessionId(session.sessionId);
+      } catch (error) {
+        Alert.alert("Error", "Failed to start session");
+        navigation.goBack();
       }
     };
 
-    Transport.on('m', handleMessage);
-    console.log('👂 Listening for attendance updates...');
+    initializeSession();
 
-    return () => {
-      Transport.off('m', handleMessage);
-    };
-  }, [meetingId, deviceId, status, navigation, courseCode]);
+    if (sessionId) {
+      const timer = BackgroundTimer.setInterval(() => {
+        setRemainingTime((prev) => {
+          if (prev <= 0) {
+            handleEndSession();
+            return 0;
+          }
+          return prev - 1;
+        });
 
-  const getStatusDisplay = () => {
-    switch (status) {
-      case 'waiting':
-        return { text: 'Waiting for confirmation...', color: '#f59e0b', icon: 'time-outline' };
-      case 'present':
-        return { text: 'Present ✓', color: '#10b981', icon: 'checkmark-circle' };
-      case 'late':
-        return { text: 'Late ⚠', color: '#f59e0b', icon: 'time-outline' };
-      default:
-        return { text: 'Unknown', color: '#6b7280', icon: 'help-circle-outline' };
+        setRemainingWindow((prev) => Math.max(0, prev - 1));
+      }, 1000);
+
+      return () => {
+        BackgroundTimer.clearInterval(timer);
+      };
     }
+  }, [sessionId]);
+
+  useEffect(() => {
+    if (sessionId) {
+      const subscription = sessionManager.onAttendanceUpdate((data) => {
+        setAttendees((prev) => [...prev, data]);
+      });
+
+      return () => subscription?.remove();
+    }
+  }, [sessionId]);
+
+  const handleEndSession = useCallback(async () => {
+    try {
+      const sessionData = await sessionManager.endSession();
+      if (sessionData) {
+        navigation.replace("SessionSuccess", { sessionData });
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to end session");
+    }
+  }, [sessionManager, navigation]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   };
 
-  const statusDisplay = getStatusDisplay();
-  const currentDate = new Date().toLocaleDateString();
+  const copySessionId = () => {
+    Clipboard.setString(sessionId);
+    Alert.alert("Copied", "Session ID copied to clipboard");
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        <View style={styles.progressSection}>
-          <Text style={styles.progressTitle}>Attendance in Progress</Text>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={24} color="#FFF" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Attendance in Progress</Text>
+      </View>
 
-          <Text style={styles.progressDescription}>
-            Your attendance request has been sent. Waiting for lecturer confirmation.
+      <View style={styles.content}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Attendance in Progress</Text>
+          <View style={styles.timerContainer}>
+            <Text style={styles.timerText}>{formatTime(remainingTime)}</Text>
+          </View>
+        </View>
+
+        <View style={styles.windowContainer}>
+          <Text style={styles.windowLabel}>
+            Attendance Window: {formatTime(remainingWindow)}
           </Text>
+          <Text style={styles.attendeeCount}>
+            Students Present: {attendees.length}
+          </Text>
+        </View>
 
-          <View style={styles.detailsContainer}>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Meeting ID</Text>
-              <Text style={styles.detailValue}>{meetingId}</Text>
-            </View>
+        <Text style={styles.description}>
+          Meeting ID generated. Copy and share with students to join this
+          session. Meeting ID expires after the set duration. Attendance is
+          being noted in the background and will be synced when internet
+          connection is back.
+        </Text>
 
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Course</Text>
-              <Text style={styles.detailValue}>{courseCode}</Text>
-            </View>
-
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Time Joined</Text>
-              <Text style={styles.detailValue}>{timeJoined}</Text>
-            </View>
-
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Date</Text>
-              <Text style={styles.detailValue}>{currentDate}</Text>
-            </View>
-
-            <View style={styles.statusRow}>
-              <Text style={styles.statusLabel}>Attendance Status</Text>
-              <View style={[styles.statusBadge, { backgroundColor: `${statusDisplay.color}15` }]}>
-                <Ionicons name={statusDisplay.icon} size={20} color={statusDisplay.color} />
-                <Text style={[styles.statusText, { color: statusDisplay.color }]}>
-                  {statusDisplay.text}
-                </Text>
-              </View>
-              {status === 'waiting' && (
-                <View style={styles.waitingIndicator}>
-                  <ActivityIndicator size="small" color="#8B5CF6" />
-                  <Text style={styles.waitingText}>
-                    Waiting for lecturer to confirm your attendance...
-                  </Text>
-                </View>
-              )}
+        <View style={styles.detailsContainer}>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Meeting ID</Text>
+            <View style={styles.detailValueContainer}>
+              <Text style={styles.detailValue}>{sessionId}</Text>
+              <TouchableOpacity
+                style={styles.copyButton}
+                onPress={copySessionId}
+              >
+                <Icon name="copy" size={16} color="#8B5CF6" />
+              </TouchableOpacity>
             </View>
           </View>
 
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Course</Text>
+            <Text style={styles.detailValue}>{courseCode}</Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Session Duration</Text>
+            <Text style={styles.detailValue}>{duration} Minutes</Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Start Time</Text>
+            <Text style={styles.detailValue}>08:00 am</Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Attendance Window</Text>
+            <Text style={styles.detailValue}>{attendanceWindow} Minutes</Text>
+          </View>
+        </View>
+
+        <View style={styles.switchContainer}>
+          <Text style={styles.switchLabel}>Switch to online mode</Text>
           <TouchableOpacity
-            style={styles.leaveButton}
-            onPress={() => navigation.navigate('Dashboard')}
+            style={[styles.switch, isOnline && styles.switchActive]}
+            onPress={() => setIsOnline(!isOnline)}
           >
-            <Text style={styles.leaveButtonText}>Leave Session</Text>
+            <View
+              style={[styles.switchThumb, isOnline && styles.switchThumbActive]}
+            />
           </TouchableOpacity>
         </View>
-      </ScrollView>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => {
+              Alert.alert(
+                "Cancel Session",
+                "Are you sure you want to cancel this session? All attendance data will be lost.",
+                [
+                  { text: "No", style: "cancel" },
+                  {
+                    text: "Yes",
+                    style: "destructive",
+                    onPress: () => navigation.goBack(),
+                  },
+                ],
+              );
+            }}
+          >
+            <Text style={styles.cancelButtonText}>Cancel Session</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.saveButton}
+            disabled={isEnding}
+            onPress={handleEndSession}
+          >
+            {isEnding ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.saveButtonText}>End Session</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
     </SafeAreaView>
   );
 };
@@ -141,172 +217,218 @@ const AttendanceInProgressScreen = ({ navigation, route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
-    paddingTop: 20,
-  },
-  scrollView: {
-    flex: 1,
+    backgroundColor: "white",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    backgroundColor: "#8B5CF6",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingVertical: 16,
+    paddingTop: 30,
   },
-  profileSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  headerTitle: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "700",
+    flex: 1,
+    textAlign: "center",
+    marginHorizontal: 20,
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
   },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#8B5CF6',
-    justifyContent: 'center',
-    alignItems: 'center',
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     marginRight: 12,
   },
-  avatarText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
   greeting: {
-    flex: 1,
-  },
-  greetingText: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 2,
-  },
-  userName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1f2937',
-  },
-  syncButton: {
-    backgroundColor: '#8B5CF6',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  syncIcon: {
-    color: 'white',
+    color: "white",
     fontSize: 12,
-    marginRight: 4,
+    opacity: 0.8,
   },
-  syncText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '500',
+  lecturerName: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
   },
-  statusSection: {
-    paddingHorizontal: 20,
-    marginBottom: 24,
-    alignItems: 'center',
+  headerRight: {
+    alignItems: "flex-end",
+  },
+  statusContainer: {
+    alignItems: "flex-end",
+    marginBottom: 8,
   },
   statusText: {
-    fontSize: 14,
-    color: '#6b7280',
+    color: "white",
+    fontSize: 10,
+    opacity: 0.8,
+    marginBottom: 4,
   },
-  progressSection: {
-    paddingHorizontal: 20,
-    marginBottom: 100,
+  syncButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.2)",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
-  progressTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1f2937',
+  syncText: {
+    color: "white",
+    fontSize: 10,
+    marginLeft: 4,
+  },
+  notificationButton: {
+    padding: 4,
+  },
+  windowContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#f3f4f6",
+    padding: 12,
+    borderRadius: 8,
     marginBottom: 16,
   },
-  progressDescription: {
+  windowLabel: {
     fontSize: 14,
-    color: '#6b7280',
+    fontWeight: "600",
+    color: "#4b5563",
+  },
+  attendeeCount: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#8B5CF6",
+  },
+  content: {
+    flex: 1,
+    backgroundColor: "white",
+    paddingHorizontal: 20,
+    paddingTop: 24,
+  },
+  titleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1f2937",
+  },
+  timerContainer: {
+    backgroundColor: "#8B5CF6",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  timerText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "white",
+  },
+  description: {
+    fontSize: 14,
+    color: "#6b7280",
     lineHeight: 20,
     marginBottom: 32,
   },
   detailsContainer: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
     marginBottom: 32,
   },
   detailRow: {
-    marginBottom: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f3f4f6",
   },
   detailLabel: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 8,
+    color: "#6b7280",
   },
   detailValue: {
     fontSize: 14,
-    color: '#1f2937',
-    fontWeight: '500',
+    fontWeight: "600",
+    color: "#1f2937",
   },
-  statusRow: {
-    marginBottom: 24,
+  detailValueContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
-  statusLabel: {
+  copyButton: {
+    marginLeft: 8,
+    padding: 4,
+  },
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 40,
+  },
+  switchLabel: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 8,
+    color: "#8B5CF6",
   },
-  statusNote: {
-    fontSize: 12,
-    color: '#8B5CF6',
-    fontStyle: 'italic',
+  switch: {
+    width: 50,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#e5e7eb",
+    justifyContent: "center",
+    paddingHorizontal: 2,
   },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginTop: 8,
-    gap: 8,
+  switchActive: {
+    backgroundColor: "#8B5CF6",
   },
-  statusText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  waitingIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
-    gap: 8,
-  },
-  waitingText: {
-    fontSize: 12,
-    color: '#6b7280',
-    fontStyle: 'italic',
-  },
-  leaveButton: {
-    backgroundColor: '#8B5CF6',
-    paddingVertical: 16,
+  switchThumb: {
+    width: 24,
+    height: 24,
     borderRadius: 12,
-    alignItems: 'center',
-    shadowColor: '#8B5CF6',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    backgroundColor: "white",
+    alignSelf: "flex-start",
   },
-  leaveButtonText: {
-    color: 'white',
+  switchThumbActive: {
+    alignSelf: "flex-end",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: "auto",
+    marginBottom: 20,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: "#fecaca",
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginRight: 8,
+  },
+  cancelButtonText: {
+    color: "#dc2626",
     fontSize: 16,
-    fontWeight: '600',
-    letterSpacing: 0.5,
+    fontWeight: "600",
+  },
+  saveButton: {
+    flex: 1,
+    backgroundColor: "#8B5CF6",
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginLeft: 8,
+  },
+  saveButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
 

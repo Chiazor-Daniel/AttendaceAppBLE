@@ -1,19 +1,33 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
 const AssignmentDetailScreen = ({ navigation, route }) => {
-  const { assignment } = route.params || {}
+  const { assignment } = route.params || {};
 
   const questions = [
     "What is the relationship between Communication and speaking when it comes to public speaking?",
     "What is the relationship between Communication and speaking when it comes to public speaking?",
     "What is the relationship between Communication and speaking when it comes to public speaking?",
     "What is the relationship between Communication and speaking when it comes to public speaking?",
-  ]
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
-     
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Assignment</Text>
+        <View style={{ width: 24 }} />
+      </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.assignmentTitle}>COM 201 Assignment</Text>
@@ -45,13 +59,13 @@ const AssignmentDetailScreen = ({ navigation, route }) => {
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "white",
   },
   header: {
     backgroundColor: "#8B5CF6",
@@ -65,17 +79,20 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: "white",
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "700",
+    flex: 1,
+    textAlign: "center",
+    marginHorizontal: 20,
   },
   content: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "white",
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 50,
   },
   assignmentTitle: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "700",
     color: "#1f2937",
     marginBottom: 24,
   },
@@ -121,6 +138,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#1f2937",
   },
-})
+});
 
-export default AssignmentDetailScreen
+export default AssignmentDetailScreen;

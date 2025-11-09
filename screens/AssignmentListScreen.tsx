@@ -1,7 +1,20 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native"
-import { Ionicons as Icon } from '@expo/vector-icons'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+  TextInput,
+} from "react-native";
+import { Ionicons as Icon } from "@expo/vector-icons";
+
+import { useState } from "react";
 
 const AssignmentListScreen = ({ navigation }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedLevel, setSelectedLevel] = useState("100 LEVEL");
+
   const assignments = [
     {
       id: 1,
@@ -52,41 +65,86 @@ const AssignmentListScreen = ({ navigation }) => {
       deadline: "Deadline 2nd June 2025",
       status: "View",
     },
-  ]
+  ];
+
+  const filteredAssignments = assignments.filter(
+    (assignment) =>
+      assignment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      assignment.instructor.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   return (
     <SafeAreaView style={styles.container}>
-      
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Assignment</Text>
+        <View style={{ width: 24 }} />
+      </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {assignments.map((assignment, index) => (
-          <TouchableOpacity
-            key={assignment.id}
-            style={styles.assignmentItem}
-            onPress={() => navigation.navigate("AssignmentDetail", { assignment })}
-          >
-            <View style={styles.assignmentIcon}>
-              <Icon name="document-text" size={20} color="#8B5CF6" />
-            </View>
-            <View style={styles.assignmentContent}>
-              <Text style={styles.assignmentTitle}>{assignment.title}</Text>
-              <Text style={styles.assignmentInstructor}>{assignment.instructor}</Text>
-              <Text style={styles.assignmentDeadline}>{assignment.deadline}</Text>
-            </View>
-            <TouchableOpacity style={styles.viewButton}>
-              <Text style={styles.viewButtonText}>{assignment.status}</Text>
+      <View style={styles.content}>
+        <Text style={styles.description}>
+          List of all assignments that have been created
+        </Text>
+
+        <View style={styles.filterSearchContainer}>
+          <View style={styles.dropdown}>
+            <Text style={styles.dropdownText}>{selectedLevel}</Text>
+            <Icon name="chevron-down" size={16} color="#6b7280" />
+          </View>
+          <View style={styles.searchContainer}>
+            <Icon name="search" size={16} color="#6b7280" />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Q Search by name/matric no"
+              placeholderTextColor="#9ca3af"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </View>
+        </View>
+
+        <ScrollView
+          style={styles.assignmentList}
+          showsVerticalScrollIndicator={false}
+        >
+          {filteredAssignments.map((assignment) => (
+            <TouchableOpacity
+              key={assignment.id}
+              style={styles.assignmentItem}
+              onPress={() =>
+                navigation.navigate("AssignmentDetail", { assignment })
+              }
+            >
+              <View style={styles.assignmentIcon}>
+                <Icon name="document-text" size={20} color="#8B5CF6" />
+              </View>
+              <View style={styles.assignmentContent}>
+                <Text style={styles.assignmentTitle}>{assignment.title}</Text>
+                <Text style={styles.assignmentInstructor}>
+                  {assignment.instructor}
+                </Text>
+                <Text style={styles.assignmentDeadline}>
+                  {assignment.deadline}
+                </Text>
+              </View>
+              <TouchableOpacity style={styles.viewButton}>
+                <Text style={styles.viewButtonText}>{assignment.status}</Text>
+              </TouchableOpacity>
             </TouchableOpacity>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+          ))}
+        </ScrollView>
+      </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f3f4f6",
+    backgroundColor: "white",
   },
   header: {
     backgroundColor: "#8B5CF6",
@@ -100,13 +158,64 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: "white",
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "700",
+    flex: 1,
+    textAlign: "center",
+    marginHorizontal: 20,
   },
   content: {
     flex: 1,
-    backgroundColor: "#f3f4f6",
+    backgroundColor: "white",
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 16,
+  },
+  description: {
+    fontSize: 14,
+    color: "#6b7280",
+    marginBottom: 16,
+  },
+  filterSearchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  dropdown: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: "white",
+  },
+  dropdownText: {
+    fontSize: 14,
+    color: "#1f2937",
+    marginRight: 8,
+    fontWeight: "600",
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: "white",
+    flex: 1,
+    marginLeft: 10,
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 14,
+    color: "#1f2937",
+  },
+  assignmentList: {
+    flex: 1,
+    paddingBottom: 100,
   },
   assignmentItem: {
     flexDirection: "row",
@@ -153,6 +262,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "500",
   },
-})
+});
 
-export default AssignmentListScreen
+export default AssignmentListScreen;
