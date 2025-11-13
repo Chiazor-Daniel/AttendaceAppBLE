@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "blecch",
-    "slug": "blecch",
+    "name": "blecch2",
+    "slug": "blecch2",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
@@ -28,7 +28,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.chiazordaniel.blecch",
+      "bundleIdentifier": "com.chiazordaniel.blecch2",
       "infoPlist": {
         "NSBluetoothAlwaysUsageDescription": "Used for offline peer-to-peer attendance via Bluetooth mesh.",
         "NSBluetoothPeripheralUsageDescription": "Needed to connect to nearby devices for class attendance.",
@@ -48,7 +48,7 @@
         "barStyle": "light-content",
         "translucent": false
       },
-      "package": "com.chiazordaniel.blecch",
+      "package": "com.chiazordaniel.blecch2",
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "BLUETOOTH",
