@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "blecch2",
+    "name": "AtendanceApp lecturer",
     "slug": "blecch2",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -28,7 +28,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.chiazordaniel.blecch2",
+      "bundleIdentifier": "com.chiazordaniel33.blecch2",
       "infoPlist": {
         "NSBluetoothAlwaysUsageDescription": "Used for offline peer-to-peer attendance via Bluetooth mesh.",
         "NSBluetoothPeripheralUsageDescription": "Needed to connect to nearby devices for class attendance.",
@@ -48,7 +48,7 @@
         "barStyle": "light-content",
         "translucent": false
       },
-      "package": "com.chiazordaniel.blecch2",
+      "package": "com.chiazordaniel33.blecch2",
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "BLUETOOTH",
@@ -58,11 +58,19 @@
         "BLUETOOTH_SCAN",
         "CAMERA",
         "USE_BIOMETRIC",
-        "USE_FINGERPRINT"
+        "USE_FINGERPRINT",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA"
       ]
     },
     "web": {
       "favicon": "./assets/logo.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "478ed5ed-4249-4996-ab9e-432ebb2f8934"
+      }
     }
   }
 }
