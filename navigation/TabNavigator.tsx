@@ -23,7 +23,7 @@ const TabIcon = ({ name, focused }: { name: string; focused: boolean }) => {
   const config = screenConfig[name as keyof typeof screenConfig];
   const iconName = config?.icon || 'home';
   const color = focused ? '#8B5CF6' : '#6b7280';
-  
+
   return (
     <View style={styles.tabItem}>
       {/* Dot indicator above active tab */}
@@ -60,9 +60,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderTopWidth: 1,
     borderTopColor: '#e5e7eb',
-    height: 70, // Reduced height since no labels
-    paddingBottom: 15,
-    paddingTop: 15,
+    height: 64,
+    paddingBottom: 12,
+    paddingTop: 12,
   },
   tabItem: {
     alignItems: 'center',
@@ -70,12 +70,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   dotIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: '#8B5CF6',
     position: 'absolute',
-    top: -12,
+    top: -10,
     zIndex: 1,
   },
 });

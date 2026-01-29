@@ -14,13 +14,13 @@ import MeshService from "../src/services/meshservice";
 
 const JoinClassSelectionScreen = ({ navigation, route }: any) => {
   const { course } = route.params || {};
-  
+
   const [meshStatus, setMeshStatus] = useState<
     "idle" | "initializing" | "searching" | "found" | "error"
   >("idle");
   const [detectedSession, setDetectedSession] = useState<any>(null);
   const [peerCount, setPeerCount] = useState(0);
-  
+
   // Animation values
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
@@ -31,14 +31,14 @@ const JoinClassSelectionScreen = ({ navigation, route }: any) => {
     const initMesh = async () => {
       try {
         setMeshStatus("initializing");
-        
+
         // Initialize mesh service with student nickname
         const nickname = `Student-${Date.now()}`;
         await MeshService.initialize(nickname);
-        
+
         setMeshStatus("searching");
         setPeerCount(MeshService.getPeerCount());
-        
+
         // Start searching animations
         startSearchingAnimations();
 
@@ -47,7 +47,7 @@ const JoinClassSelectionScreen = ({ navigation, route }: any) => {
           console.log("✅ Class found!", session);
           setDetectedSession(session);
           setMeshStatus("found");
-          
+
           Alert.alert(
             "Class Found!",
             `Detected ${session.course} class by ${session.lecturer}. Ready to verify.`
@@ -74,8 +74,11 @@ const JoinClassSelectionScreen = ({ navigation, route }: any) => {
         console.error("Mesh initialization failed:", error);
         setMeshStatus("error");
         Alert.alert(
-          "Connection Error",
-          error.message || "Failed to start mesh networking. Please check Bluetooth and Location permissions."
+          "Connection Required",
+          "Please enable Bluetooth and Location services to join class sessions.\n\nSteps:\n1. Open Settings\n2. Enable Bluetooth\n3. Enable Location Services\n4. Return to the app",
+          [
+            { text: "OK", style: "default" }
+          ]
         );
       }
     };
@@ -95,7 +98,7 @@ const JoinClassSelectionScreen = ({ navigation, route }: any) => {
     } else {
       stopSearchingAnimations();
     }
-    
+
     return () => stopSearchingAnimations();
   }, [meshStatus]);
 
@@ -148,7 +151,7 @@ const JoinClassSelectionScreen = ({ navigation, route }: any) => {
       return;
     }
 
-    const navigationParams: any = { 
+    const navigationParams: any = {
       isClass: true,
       meshMode: true,
       session: detectedSession,
@@ -240,13 +243,15 @@ const JoinClassSelectionScreen = ({ navigation, route }: any) => {
 
         {meshStatus === "error" && (
           <View style={[styles.statusBox, styles.statusError]}>
-            <Icon name="alert-circle" size={24} color="#ef4444" />
-            <Text style={styles.statusText}>
-              Connection unavailable
-            </Text>
-            <Text style={styles.statusSubtext}>
-              Check Bluetooth and Location permissions
-            </Text>
+            <Icon name="alert-circle" size={20} color="#ef4444" />
+            <View style={styles.errorContent}>
+              <Text style={styles.statusText}>
+                Connection Unavailable
+              </Text>
+              <Text style={styles.statusSubtext}>
+                Please enable Bluetooth and Location in your device settings to join class sessions.
+              </Text>
+            </View>
           </View>
         )}
       </View>
@@ -256,12 +261,22 @@ const JoinClassSelectionScreen = ({ navigation, route }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Join Class session</Text>
+        <Text style={styles.title}>Join Class Session</Text>
         <Text style={styles.subtitle}>
-          Class will be detected automatically. Once found, verify your identity with your device biometric.
+          Your class will be detected automatically via Bluetooth. Once found, verify your identity to mark attendance.
         </Text>
 
         {renderMeshStatus()}
+
+        {/* Helpful Tips */}
+        {meshStatus === "searching" && (
+          <View style={styles.tipsContainer}>
+            <Icon name="information-circle-outline" size={16} color="#6b7280" />
+            <Text style={styles.tipsText}>
+              Make sure you're near the classroom and Bluetooth is enabled
+            </Text>
+          </View>
+        )}
 
         {/* Start Verification Button */}
         <TouchableOpacity
@@ -272,7 +287,9 @@ const JoinClassSelectionScreen = ({ navigation, route }: any) => {
           onPress={handleStartVerification}
           disabled={meshStatus !== "found"}
         >
-          <Text style={styles.startButtonText}>Start Verification</Text>
+          <Text style={styles.startButtonText}>
+            {meshStatus === "found" ? "Start Verification" : "Searching for Class..."}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -290,27 +307,27 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "700",
     color: "#1f2937",
-    marginBottom: 8,
+    marginBottom: 6,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 13,
     color: "#6b7280",
-    marginBottom: 24,
-    lineHeight: 20,
+    marginBottom: 20,
+    lineHeight: 19,
   },
   meshStatusContainer: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   statusBox: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
+    padding: 14,
     borderRadius: 12,
-    marginBottom: 12,
-    gap: 12,
+    marginBottom: 10,
+    gap: 10,
   },
   statusInitializing: {
     backgroundColor: "#e9d5ff",
@@ -333,19 +350,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
-    gap: 16,
+    gap: 14,
   },
   iconWrapper: {
-    width: 60,
-    height: 60,
+    width: 56,
+    height: 56,
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
   },
   searchIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: "#e0e7ff",
     justifyContent: "center",
     alignItems: "center",
@@ -356,18 +373,18 @@ const styles = StyleSheet.create({
   },
   searchingTextContainer: {
     flex: 1,
-    gap: 8,
+    gap: 6,
   },
   peerInfo: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 5,
   },
   wave: {
     position: "absolute",
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     borderWidth: 2,
     borderColor: "#8B5CF6",
   },
@@ -377,22 +394,43 @@ const styles = StyleSheet.create({
   },
   statusError: {
     backgroundColor: "#fee2e2",
+    borderWidth: 1,
+    borderColor: "#fca5a5",
+  },
+  errorContent: {
+    flex: 1,
   },
   statusText: {
-    flex: 1,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "600",
     color: "#1f2937",
+    marginBottom: 4,
   },
   statusSubtext: {
-    width: "100%",
-    fontSize: 12,
+    fontSize: 11,
     color: "#6b7280",
-    marginTop: 4,
+    lineHeight: 16,
+  },
+  tipsContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    backgroundColor: "#f9fafb",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  tipsText: {
+    flex: 1,
+    fontSize: 11,
+    color: "#6b7280",
+    lineHeight: 16,
   },
   startButton: {
     backgroundColor: "#8B5CF6",
-    paddingVertical: 16,
+    paddingVertical: 15,
     borderRadius: 12,
     alignItems: "center",
     marginTop: "auto",
@@ -408,12 +446,13 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   startButtonDisabled: {
-    opacity: 0.5,
+    opacity: 0.6,
     backgroundColor: "#d1d5db",
+    shadowOpacity: 0,
   },
   startButtonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "600",
   },
 });

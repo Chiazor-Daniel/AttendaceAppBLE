@@ -14,8 +14,8 @@ import {
 } from 'react-native';
 import { Image } from 'react-native';
 
-const SignInScreen = ({ navigation } : any) => {
-  const [metroNumber, setMetroNumber] = useState(''); 
+const SignInScreen = ({ navigation }: any) => {
+  const [metroNumber, setMetroNumber] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSignIn = () => {
@@ -32,21 +32,21 @@ const SignInScreen = ({ navigation } : any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor={"#8B5CF6"}/>
-      <KeyboardAvoidingView 
+      <StatusBar backgroundColor={"#8B5CF6"} />
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Logo Section */}
           <View style={styles.logoContainer}>
-           <Image source={require('../assets/logo.png')} style={styles.logo}/>
+            <Image source={require('../assets/logo.png')} style={styles.logo} />
           </View>
 
           {/* Form Section */}
           <View style={styles.formContainer}>
             <Text style={styles.title}>SIGN IN</Text>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Metro Number</Text>
               <TextInput
@@ -98,22 +98,21 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: 60,
-    marginBottom: 50,
+    marginTop: 40,
+    marginBottom: 32,
   },
   logo: {
-    width: 250,
-    height: 250,
+    width: 200,
+    height: 200,
   },
   logoWrapper: {
-    width: 80,
-    height: 80,
-    backgroundColor: '#8B5CF6', // Purple logo background
-    borderRadius: 20,
+    width: 70,
+    height: 70,
+    backgroundColor: '#8B5CF6',
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
-    // Add shadow for depth
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -124,45 +123,45 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   logoText: {
-    fontSize: 36,
+    fontSize: 32,
     fontWeight: 'bold',
     color: 'white',
   },
   appName: {
-    fontSize: 22,
+    fontSize: 17,
     fontWeight: '600',
     color: '#1f2937',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   appSubtitle: {
-    fontSize: 16,
+    fontSize: 13,
     color: '#6b7280',
     fontWeight: '400',
   },
   formContainer: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: 14,
   },
   title: {
-    fontSize: 20,
+    fontSize: 15,
     fontWeight: '700',
     color: '#1f2937',
-    marginBottom: 40,
-    letterSpacing: 1,
+    marginBottom: 24,
+    letterSpacing: 0.5,
   },
   inputGroup: {
-    marginBottom: 32,
+    marginBottom: 20,
   },
   label: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#374151',
-    marginBottom: 12,
+    marginBottom: 8,
     fontWeight: '500',
   },
   input: {
-    fontSize: 16,
+    fontSize: 13,
     color: '#1f2937',
-    paddingVertical: 12,
+    paddingVertical: 9,
     paddingHorizontal: 0,
     borderBottomWidth: 1,
     borderBottomColor: '#d1d5db',
@@ -170,12 +169,11 @@ const styles = StyleSheet.create({
   },
   signInButton: {
     backgroundColor: '#8B5CF6',
-    paddingVertical: 16,
-    borderRadius: 12,
+    paddingVertical: 12,
+    borderRadius: 10,
     alignItems: 'center',
-    marginTop: 40,
-    marginBottom: 24,
-    // Add shadow
+    marginTop: 24,
+    marginBottom: 16,
     shadowColor: '#8B5CF6',
     shadowOffset: {
       width: 0,
@@ -187,16 +185,16 @@ const styles = StyleSheet.create({
   },
   signInButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: '600',
     letterSpacing: 0.5,
   },
   linkContainer: {
     alignItems: 'center',
-    paddingBottom: 40,
+    paddingBottom: 24,
   },
   linkText: {
-    fontSize: 14,
+    fontSize: 11,
     color: '#6b7280',
     textAlign: 'center',
   },

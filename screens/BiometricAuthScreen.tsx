@@ -33,7 +33,7 @@ const BiometricAuthScreen = ({ navigation, route }: any) => {
     try {
       const rnBiometrics = new RNBiometrics();
       const { available, biometryType } = await rnBiometrics.isSensorAvailable();
-      
+
       if (available) {
         // Map biometry types - react-native-biometrics returns strings
         if (biometryType === 'FaceID' || biometryType === 'Face') {
@@ -73,10 +73,10 @@ const BiometricAuthScreen = ({ navigation, route }: any) => {
 
     try {
       const rnBiometrics = new RNBiometrics();
-      
+
       // Determine prompt message based on device
-      const promptMessage = 
-        Platform.OS === 'ios' 
+      const promptMessage =
+        Platform.OS === 'ios'
           ? 'Use Face ID to verify your attendance'
           : 'Use your fingerprint to verify your attendance';
 
@@ -191,7 +191,7 @@ const BiometricAuthScreen = ({ navigation, route }: any) => {
 
   const getBiometricIcon = () => {
     if (Platform.OS === 'ios') {
-      return 'face-recognition';
+      return 'scan'; // Face ID representation
     }
     return 'finger-print';
   };
@@ -226,7 +226,7 @@ const BiometricAuthScreen = ({ navigation, route }: any) => {
               color="#8B5CF6"
             />
           </View>
-          
+
           <Text style={styles.biometricLabel}>
             {getBiometricLabel()}
           </Text>
@@ -285,33 +285,33 @@ const styles = StyleSheet.create({
   },
   meshInfoContainer: {
     backgroundColor: '#e0e7ff',
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 32,
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 24,
     width: '100%',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#8B5CF6',
   },
   meshInfoText: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#8B5CF6',
     fontWeight: '500',
     textAlign: 'center',
   },
   biometricContainer: {
     alignItems: 'center',
-    marginBottom: 60,
-    marginTop: 40,
+    marginBottom: 50,
+    marginTop: 30,
   },
   biometricIconWrapper: {
-    width: 160,
-    height: 160,
-    borderRadius: 80,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
     backgroundColor: '#f9fafb',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
     borderWidth: 2,
     borderColor: '#8B5CF6',
     shadowColor: '#8B5CF6',
@@ -324,21 +324,21 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   biometricLabel: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '700',
     color: '#1f2937',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   biometricSubtext: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#6b7280',
     textAlign: 'center',
     paddingHorizontal: 20,
-    lineHeight: 20,
+    lineHeight: 19,
   },
   authenticateButton: {
     backgroundColor: '#8B5CF6',
-    paddingVertical: 16,
+    paddingVertical: 15,
     paddingHorizontal: 40,
     borderRadius: 12,
     alignItems: 'center',
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
   },
   authenticateButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     letterSpacing: 0.5,
   },
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
     marginBottom: 20,
     backgroundColor: 'white',
-    padding: 24,
+    padding: 20,
     borderRadius: 12,
     width: '100%',
     shadowColor: '#000',
@@ -379,18 +379,18 @@ const styles = StyleSheet.create({
   },
   authenticatingText: {
     color: '#8B5CF6',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-    marginTop: 16,
+    marginTop: 14,
   },
   broadcastingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
     gap: 8,
-    marginBottom: 20,
+    marginBottom: 18,
     backgroundColor: '#e0e7ff',
     borderRadius: 12,
     width: '100%',
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
   },
   broadcastingText: {
     color: '#8B5CF6',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
   },
 });

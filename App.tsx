@@ -6,18 +6,10 @@ import LogoScreen from "./screens/LogoScreen";
 import SignUpScreen from "./screens/SignUpScreen";
 import SignInScreen from "./screens/SignInScreen";
 import OTPVerificationScreen from "./screens/OTPVerificationScreen";
-import FacialRecognitionScreen from "./screens/FacialRecognitionScreen";
-import FacialCaptureSuccessScreen from "./screens/FacialCaptureSuccessScreen";
-import FacialCaptureFailedScreen from "./screens/FacialCaptureFailedScreen";
-import FingerprintCaptureScreen from "./screens/FingerprintCaptureScreen";
-import FingerprintSuccessScreen from "./screens/FingerprintSuccessScreen";
-import FingerprintFailedScreen from "./screens/FingerprintFailedScreen";
 import CreatePinScreen from "./screens/CreatePinScreen";
 import SetPinScreen from "./screens/SetPinScreen";
 import PinCreatedSuccessScreen from "./screens/PinCreatedSuccessScreen";
 import TabNavigator from "./navigation/TabNavigator";
-import AttendanceSessionScreen from "./screens/AttendanceSessionScreen";
-import AttendanceInProgressScreen from "./screens/AttendanceInProgressScreen";
 
 import SessionConnectedScreen from "./screens/SessionConnectedScreen";
 import SessionFailedScreen from "./screens/SessionFailedScreen";
@@ -26,15 +18,6 @@ import SessionOverScreen from "./screens/SessionOverScreen";
 // New biometric screens
 import JoinClassSelectionScreen from "./screens/JoinClassSelectionScreen";
 import BiometricAuthScreen from "./screens/BiometricAuthScreen";
-import FacialRecognitionSetupScreen from "./screens/FacialRecognitionSetupScreen";
-import FacialDetectionScanningScreen from "./screens/FacialDetectionScanningScreen";
-import FacialDetectionSuccessScreen from "./screens/FacialDetectionSuccessScreen";
-import FacialDetectionFailedScreen from "./screens/FacialDetectionFailedScreen";
-import FingerprintScanningScreen from "./screens/FingerprintScanningScreen";
-import FingerprintVerificationSuccessScreen from "./screens/FingerprintVerificationSuccessScreen";
-import FingerprintVerificationFailedScreen from "./screens/FingerprintVerificationFailedScreen";
-import PinInputScreen from "./screens/PinInputScreen";
-import PinInputErrorScreen from "./screens/PinInputErrorScreen";
 
 // Profile and settings screens
 import ProfileScreen from "./screens/ProfileScreen";
@@ -67,30 +50,10 @@ const hiddenHeaderScreens = [
   "SignIn",
   "OTPVerification",
 
-  // Facial recognition flows
-  "FacialRecognition",
-  "FacialCaptureSuccess",
-  "FacialCaptureFailed",
-  "FacialRecognitionSetup",
-  "FacialDetectionScanning",
-  "FacialDetectionSuccess",
-  "FacialDetectionFailed",
-  "AdvancedFacialDetection",
-
-  // Fingerprint flows
-  "FingerprintCapture",
-  "FingerprintSuccess",
-  "FingerprintFailed",
-  "FingerprintScanning",
-  "FingerprintVerificationSuccess",
-  "FingerprintVerificationFailed",
-
   // PIN flows
   "CreatePin",
   "SetPin",
   "PinCreatedSuccess",
-  "PinInput",
-  "PinInputError",
 
   // Session flows
   "SessionConnected",
@@ -109,25 +72,25 @@ export default function App() {
       <NavigationContainer>
         <StatusBar style="auto" />
         <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          cardStyleInterpolator: CardStyleInterpolators.forNoAnimation,
-        }}
-        initialRouteName="Splash"
-      >
-        {screens.map(({ name, component }) => (
-          <Stack.Screen
-            key={name}
-            name={name}
-            children={(props) => (
-              <>
-                {!hiddenHeaderScreens.includes(name) && <Header />}
-                {React.createElement(component, props)}
-              </>
-            )}
-          />
-        ))}
-      </Stack.Navigator>
+          screenOptions={{
+            headerShown: false,
+            cardStyleInterpolator: CardStyleInterpolators.forNoAnimation,
+          }}
+          initialRouteName="Splash"
+        >
+          {screens.map(({ name, component }) => (
+            <Stack.Screen
+              key={name}
+              name={name}
+              children={(props) => (
+                <>
+                  {!hiddenHeaderScreens.includes(name) && <Header />}
+                  {React.createElement(component, props)}
+                </>
+              )}
+            />
+          ))}
+        </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
   );
@@ -141,34 +104,10 @@ const screens = [
   { name: "SignUp", component: SignUpScreen, auth: true },
   { name: "SignIn", component: SignInScreen, auth: true },
   { name: "OTPVerification", component: OTPVerificationScreen, auth: true },
-  { name: "FacialRecognition", component: FacialRecognitionScreen, auth: true },
-  {
-    name: "FacialCaptureSuccess",
-    component: FacialCaptureSuccessScreen,
-    auth: true,
-  },
-  {
-    name: "FacialCaptureFailed",
-    component: FacialCaptureFailedScreen,
-    auth: true,
-  },
-  {
-    name: "FingerprintCapture",
-    component: FingerprintCaptureScreen,
-    auth: true,
-  },
-  {
-    name: "FingerprintSuccess",
-    component: FingerprintSuccessScreen,
-    auth: true,
-  },
-  { name: "FingerprintFailed", component: FingerprintFailedScreen, auth: true },
   { name: "CreatePin", component: CreatePinScreen, auth: true },
   { name: "SetPin", component: SetPinScreen, auth: true },
   { name: "PinCreatedSuccess", component: PinCreatedSuccessScreen, auth: true },
   { name: "Dashboard", component: TabNavigator },
-  { name: "AttendanceSession", component: AttendanceSessionScreen },
-  { name: "AttendanceInProgress", component: AttendanceInProgressScreen },
 
   // New session screens
   { name: "SessionConnected", component: SessionConnectedScreen },
@@ -178,21 +117,6 @@ const screens = [
   // New biometric screens
   { name: "JoinClassSelection", component: JoinClassSelectionScreen },
   { name: "BiometricAuth", component: BiometricAuthScreen },
-  { name: "FacialRecognitionSetup", component: FacialRecognitionSetupScreen },
-  { name: "FacialDetectionScanning", component: FacialDetectionScanningScreen },
-  { name: "FacialDetectionSuccess", component: FacialDetectionSuccessScreen },
-  { name: "FacialDetectionFailed", component: FacialDetectionFailedScreen },
-  { name: "FingerprintScanning", component: FingerprintScanningScreen },
-  {
-    name: "FingerprintVerificationSuccess",
-    component: FingerprintVerificationSuccessScreen,
-  },
-  {
-    name: "FingerprintVerificationFailed",
-    component: FingerprintVerificationFailedScreen,
-  },
-  { name: "PinInput", component: PinInputScreen },
-  { name: "PinInputError", component: PinInputErrorScreen },
 
   // Profile and settings screens → SHOW HEADER
   { name: "Profile", component: ProfileScreen },
