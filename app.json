@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "blecch",
-    "slug": "blecch",
+    "name": "AttendaceAppStudent",
+    "slug": "attendace-app-student",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -28,7 +28,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.chiazordaniel.blecch",
+      "bundleIdentifier": "com.attendaceappstudent",
       "infoPlist": {
         "NSBluetoothAlwaysUsageDescription": "Used for offline peer-to-peer attendance via Bluetooth mesh.",
         "NSBluetoothPeripheralUsageDescription": "Needed to connect to nearby devices for class attendance.",
@@ -43,8 +43,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.chiazordaniel.blecch",
-      "minSdkVersion": 26,
+      "package": "com.attendaceappstudent",
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "BLUETOOTH",
